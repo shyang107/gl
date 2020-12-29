@@ -116,7 +116,7 @@ func init() {
 	app.ArgsUsage = "[directory]"
 
 	cli.VersionPrinter = func(c *cli.Context) {
-		fmt.Printf("%s version %s @ %v\n", c.App.Name, color.New(color.FgHiGreen).Sprint(c.App.Version), filetree.GetColorizedTime(c.App.Compiled))
+		fmt.Printf("%s version %s @ %v\n", c.App.Name, color.New(color.FgHiGreen).Sprint(c.App.Version), filetree.NewEXAColor("da").Sprint(c.App.Compiled.Format("Jan 2, 2006")))
 	}
 
 	app.Commands = []*cli.Command{
