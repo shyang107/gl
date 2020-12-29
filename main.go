@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/mitchellh/go-homedir"
 	"github.com/shyang107/paw/filetree"
@@ -10,6 +11,10 @@ import (
 	"github.com/shyang107/paw"
 	_ "github.com/shyang107/paw"
 	"github.com/urfave/cli"
+)
+
+const (
+	version = "0.0.1-2020.12.29"
 )
 
 var (
@@ -26,7 +31,7 @@ var (
 	listFlag = cli.BoolFlag{
 		Name:        "list",
 		Aliases:     []string{"l"},
-		Value:       false,
+		Value:       true,
 		Usage:       "print out in list view",
 		Destination: &isList,
 	}
@@ -74,9 +79,35 @@ var (
 
 func init() {
 	paw.GologInit(os.Stdout, os.Stdout, os.Stderr, false)
+	cli.VersionFlag = &cli.BoolFlag{
+		Name:    "version",
+		Aliases: []string{"v", "V"},
+		Usage:   "print only the version",
+	}
 
-	app.Name = "cl"
-	app.Usage = "list directory/file in color view"
+	app.Name = "gl"
+	app.Usage = "list directory (excluding hidden items) in color view."
+	app.Version = version
+	app.Compiled = time.Now()
+	app.Authors = []*cli.Author{
+		&cli.Author{
+			Name:  "Shuhhua Yang",
+			Email: "shyang107@gmail.com",
+		},
+	}
+	app.ArgsUsage = "[directory]"
+
+	app.Commands = []*cli.Command{
+		&cli.Command{
+			Name:    "version",
+			Aliases: []string{"v", "V"},
+			Usage:   "print only the version",
+			Action: func(c *cli.Context) error {
+				cli.ShowVersion(c)
+				return nil
+			},
+		},
+	}
 
 	app.Flags = []cli.Flag{
 		&listFlag, &listTreeFlag, &treeFlag, &tableFlag, &levelFlag, &depthFlag,
@@ -92,14 +123,16 @@ func init() {
 		} else {
 			path, err = filepath.Abs(path)
 		}
-		if err != nil || !paw.IsDirExist(path) || !paw.IsFileExist(path) {
+		if err != nil || !paw.IsExist(path) {
+			// paw.Error.Printf("%q error: %v", path, err)
 			paw.Error.Printf("%q does not exist or error: %v", path, err)
 			os.Exit(1)
 		}
 
-		if isList {
-			pdopt.OutOpt = filetree.PListView
-		} else if isListTree {
+		// if isList {
+		// 	pdopt.OutOpt = filetree.PListView
+		// } else
+		if isListTree {
 			if depth == 0 {
 				depth = -1
 			}
@@ -113,9 +146,10 @@ func init() {
 			pdopt.OutOpt = filetree.PTableView
 		} else if isLevel {
 			pdopt.OutOpt = filetree.PLevelView
-		} else {
-			pdopt.OutOpt = filetree.PListView
 		}
+		// else {
+		// 	pdopt.OutOpt = filetree.PListView
+		// }
 
 		pdopt.Depth = depth
 
