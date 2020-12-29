@@ -1,10 +1,13 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 	"time"
 
+	"github.com/fatih/color"
 	"github.com/mitchellh/go-homedir"
 	"github.com/shyang107/paw/filetree"
 
@@ -14,19 +17,21 @@ import (
 )
 
 const (
-	version = "0.0.1-2020.12.29"
+	version = "0.0.1"
 )
 
 var (
 	app = cli.NewApp()
 
-	path       string
-	isList     bool
-	isListTree bool
-	isTree     bool
-	isTable    bool
-	isLevel    bool
-	depth      int
+	path          string
+	isList        bool
+	isListTree    bool
+	isTree        bool
+	isTable       bool
+	isLevel       bool
+	depth         int
+	isAllFiles    bool
+	ignorePattern string
 
 	listFlag = cli.BoolFlag{
 		Name:        "list",
@@ -63,13 +68,26 @@ var (
 		Usage:       "print out in the level view",
 		Destination: &isLevel,
 	}
-
 	depthFlag = cli.IntFlag{
 		Name:        "depth",
 		Aliases:     []string{"d"},
 		Value:       0,
 		Usage:       "print out in the level view",
 		Destination: &depth,
+	}
+	allFilesFlag = cli.BoolFlag{
+		Name:        "all",
+		Aliases:     []string{"a"},
+		Value:       false,
+		Usage:       "show all file including hidden files",
+		Destination: &isAllFiles,
+	}
+	ignorePatternFlag = cli.StringFlag{
+		Name:        "ignore-pattern",
+		Aliases:     []string{"p"},
+		Value:       "",
+		Usage:       "set pattern of `regexp` to ignore some files",
+		Destination: &ignorePattern,
 	}
 
 	pdopt = filetree.NewPrintDirOption()
@@ -97,6 +115,10 @@ func init() {
 	}
 	app.ArgsUsage = "[directory]"
 
+	cli.VersionPrinter = func(c *cli.Context) {
+		fmt.Printf("%s version %s @ %v\n", c.App.Name, color.New(color.FgHiGreen).Sprint(c.App.Version), filetree.GetColorizedTime(c.App.Compiled))
+	}
+
 	app.Commands = []*cli.Command{
 		&cli.Command{
 			Name:    "version",
@@ -110,7 +132,7 @@ func init() {
 	}
 
 	app.Flags = []cli.Flag{
-		&listFlag, &listTreeFlag, &treeFlag, &tableFlag, &levelFlag, &depthFlag,
+		&listFlag, &listTreeFlag, &treeFlag, &tableFlag, &levelFlag, &depthFlag, &allFilesFlag, &ignorePatternFlag,
 	}
 
 	app.Action = func(c *cli.Context) error {
@@ -150,6 +172,49 @@ func init() {
 		// else {
 		// 	pdopt.OutOpt = filetree.PListView
 		// }
+
+		if isAllFiles {
+			pdopt.Ignore = func(f *filetree.File, e error) error {
+				return nil
+			}
+		}
+		if len(ignorePattern) > 0 {
+			re, err := regexp.Compile(ignorePattern)
+			if err != nil {
+				paw.Error.Printf("%s, error: %v", re.String(), err)
+				os.Exit(1)
+			}
+			pdopt.Ignore = func(f *filetree.File, e error) error {
+				if err != nil {
+					return err
+				}
+				_, file := filepath.Split(f.Path)
+				if paw.HasPrefix(file, ".") {
+					return filetree.SkipThis
+				}
+				if re.MatchString(f.BaseName) {
+					return filetree.SkipThis
+				}
+				return nil
+			}
+		}
+
+		if isAllFiles && len(ignorePattern) > 0 {
+			re, err := regexp.Compile(ignorePattern)
+			if err != nil {
+				paw.Error.Printf("%s, error: %v", re.String(), err)
+				os.Exit(1)
+			}
+			pdopt.Ignore = func(f *filetree.File, e error) error {
+				if err != nil {
+					return err
+				}
+				if re.MatchString(f.BaseName) {
+					return filetree.SkipThis
+				}
+				return nil
+			}
+		}
 
 		pdopt.Depth = depth
 
