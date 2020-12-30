@@ -2,14 +2,14 @@
 
 `gl path` list files of path in color view.
 
-`gl` is spired by [macOS · exa](https://the.exa.website/install/macos).
+`gl` is in spired by [macOS · exa](https://the.exa.website/install/macos).
 
 ```none
 NAME:
    gl - list directory (excluding hidden items) in color view.
 
 USAGE:
-   gl [global options] command [command options] [directory]
+   gl [global options] command [command options] [path]
 
 VERSION:
    0.0.2
@@ -27,7 +27,9 @@ GLOBAL OPTIONS:
    --tree, -T                     print out in the tree view (default: false)
    --table, -b                    print out in the table view (default: false)
    --level, -L                    print out in the level view (default: false)
+   --classify, -F                 display type indicator by file names (default: false)
    --depth value, -d value        print out in the level view (default: 0)
+   --recurse, -R                  recurse into directories (equivalent to --depth=-1) (default: false)
    --all, -a                      show all file including hidden files (default: false)
    --include pattern, -n pattern  set regex pattern to include some files, applied to file only
    --exclude pattern, -x pattern  set regex pattern to exclude some files, applied to file only

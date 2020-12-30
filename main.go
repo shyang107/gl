@@ -29,6 +29,8 @@ var (
 	isTree         bool
 	isTable        bool
 	isLevel        bool
+	isClassify     bool
+	isRecurse      bool
 	depth          int
 	isAllFiles     bool
 	includePattern string
@@ -69,12 +71,26 @@ var (
 		Usage:       "print out in the level view",
 		Destination: &isLevel,
 	}
+	clsassifyFlag = cli.BoolFlag{
+		Name:        "classify",
+		Aliases:     []string{"F"},
+		Value:       false,
+		Usage:       "display type indicator by file names",
+		Destination: &isClassify,
+	}
 	depthFlag = cli.IntFlag{
 		Name:        "depth",
 		Aliases:     []string{"d"},
 		Value:       0,
 		Usage:       "print out in the level view",
 		Destination: &depth,
+	}
+	recurseFlag = cli.BoolFlag{
+		Name:        "recurse",
+		Aliases:     []string{"R"},
+		Value:       false,
+		Usage:       "recurse into directories (equivalent to --depth=-1)",
+		Destination: &isRecurse,
 	}
 	allFilesFlag = cli.BoolFlag{
 		Name:        "all",
@@ -109,10 +125,10 @@ const (
 	allFlag patflag = 1 << iota
 	includeFlag
 	excludeFlag
-	allinclude      = allFlag | includeFlag
-	allexclude      = allFlag | excludeFlag
-	allinAndexclude = allFlag | includeFlag | excludeFlag
-	inAndexclude    = includeFlag | excludeFlag
+	allincludeFlag      = allFlag | includeFlag
+	allexcludeFlag      = allFlag | excludeFlag
+	allinAndexcludeFlag = allFlag | includeFlag | excludeFlag
+	inAndexcludeFlag    = includeFlag | excludeFlag
 )
 
 func init() {
@@ -152,7 +168,7 @@ func init() {
 	}
 
 	app.Flags = []cli.Flag{
-		&listFlag, &listTreeFlag, &treeFlag, &tableFlag, &levelFlag, &depthFlag, &allFilesFlag, &includePatternFlag, &excludePatternFlag,
+		&listFlag, &listTreeFlag, &treeFlag, &tableFlag, &levelFlag, &clsassifyFlag, &depthFlag, &recurseFlag, &allFilesFlag, &includePatternFlag, &excludePatternFlag,
 	}
 
 	app.Action = func(c *cli.Context) error {
@@ -170,13 +186,13 @@ func init() {
 			optInclude()
 		case excludeFlag:
 			optExclude()
-		case allinclude:
+		case allincludeFlag:
 			optAllInclude()
-		case allexclude:
+		case allexcludeFlag:
 			optAllExclude()
-		case allinAndexclude:
+		case allinAndexcludeFlag:
 			optAllInAndExclude()
-		case inAndexclude:
+		case inAndexcludeFlag:
 			optInAndExclude()
 		}
 
@@ -196,15 +212,15 @@ func getpatflag() (pflag patflag) {
 		goto END
 	}
 	if isAllFiles && len(excludePattern) > 0 && len(includePattern) == 0 {
-		pflag = allexclude
+		pflag = allexcludeFlag
 		goto END
 	}
 	if isAllFiles && len(excludePattern) > 0 && len(includePattern) > 0 {
-		pflag = allinAndexclude
+		pflag = allinAndexcludeFlag
 		goto END
 	}
 	if isAllFiles && len(excludePattern) == 0 && len(includePattern) > 0 {
-		pflag = allinclude
+		pflag = allincludeFlag
 		goto END
 	}
 
@@ -213,7 +229,7 @@ func getpatflag() (pflag patflag) {
 		goto END
 	}
 	if !isAllFiles && len(excludePattern) > 0 && len(includePattern) > 0 {
-		pflag = inAndexclude
+		pflag = inAndexcludeFlag
 		goto END
 	}
 	if !isAllFiles && len(excludePattern) == 0 && len(includePattern) > 0 {
@@ -378,10 +394,16 @@ func ckView() {
 		pdopt.OutOpt = filetree.PTableView
 	} else if isLevel {
 		pdopt.OutOpt = filetree.PLevelView
+	} else if isClassify {
+		pdopt.OutOpt = filetree.PClassifyView
 	}
 	// else {
 	// 	pdopt.OutOpt = filetree.PListView
 	// }
+
+	if isRecurse {
+		depth = -1
+	}
 
 	pdopt.Depth = depth
 }
