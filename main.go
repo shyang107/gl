@@ -17,21 +17,22 @@ import (
 )
 
 const (
-	version = "0.0.1"
+	version = "0.0.2"
 )
 
 var (
 	app = cli.NewApp()
 
-	path          string
-	isList        bool
-	isListTree    bool
-	isTree        bool
-	isTable       bool
-	isLevel       bool
-	depth         int
-	isAllFiles    bool
-	ignorePattern string
+	path           string
+	isList         bool
+	isListTree     bool
+	isTree         bool
+	isTable        bool
+	isLevel        bool
+	depth          int
+	isAllFiles     bool
+	includePattern string
+	excludePattern string
 
 	listFlag = cli.BoolFlag{
 		Name:        "list",
@@ -82,17 +83,36 @@ var (
 		Usage:       "show all file including hidden files",
 		Destination: &isAllFiles,
 	}
-	ignorePatternFlag = cli.StringFlag{
-		Name:        "ignore-pattern",
-		Aliases:     []string{"p"},
+	includePatternFlag = cli.StringFlag{
+		Name:        "include",
+		Aliases:     []string{"n"},
 		Value:       "",
-		Usage:       "set pattern of `regexp` to ignore some files",
-		Destination: &ignorePattern,
+		Usage:       "set regex `pattern` to include some files, applied to file only",
+		Destination: &includePattern,
+	}
+	excludePatternFlag = cli.StringFlag{
+		Name:        "exclude",
+		Aliases:     []string{"x"},
+		Value:       "",
+		Usage:       "set regex `pattern` to exclude some files, applied to file only",
+		Destination: &excludePattern,
 	}
 
 	pdopt = filetree.NewPrintDirOption()
 
 	err error
+)
+
+type patflag int
+
+const (
+	allFlag patflag = 1 << iota
+	includeFlag
+	excludeFlag
+	allinclude      = allFlag | includeFlag
+	allexclude      = allFlag | excludeFlag
+	allinAndexclude = allFlag | includeFlag | excludeFlag
+	inAndexclude    = includeFlag | excludeFlag
 )
 
 func init() {
@@ -113,7 +133,7 @@ func init() {
 			Email: "shyang107@gmail.com",
 		},
 	}
-	app.ArgsUsage = "[directory]"
+	app.ArgsUsage = "[path]"
 
 	cli.VersionPrinter = func(c *cli.Context) {
 		fmt.Printf("%s version %s @ %v\n", c.App.Name, color.New(color.FgHiGreen).Sprint(c.App.Version), filetree.NewEXAColor("da").Sprint(c.App.Compiled.Format("Jan 2, 2006")))
@@ -132,100 +152,256 @@ func init() {
 	}
 
 	app.Flags = []cli.Flag{
-		&listFlag, &listTreeFlag, &treeFlag, &tableFlag, &levelFlag, &depthFlag, &allFilesFlag, &ignorePatternFlag,
+		&listFlag, &listTreeFlag, &treeFlag, &tableFlag, &levelFlag, &depthFlag, &allFilesFlag, &includePatternFlag, &excludePatternFlag,
 	}
 
 	app.Action = func(c *cli.Context) error {
-		path = c.Args().Get(0)
-		if len(path) == 0 {
-			path = "."
-		}
-		if paw.HasPrefix(path, "~") {
-			path, err = homedir.Expand(path)
-		} else {
-			path, err = filepath.Abs(path)
-		}
-		if err != nil || !paw.IsExist(path) {
-			// paw.Error.Printf("%q error: %v", path, err)
-			paw.Error.Printf("%q does not exist or error: %v", path, err)
-			os.Exit(1)
-		}
+		path = getPath(c)
 
-		// if isList {
-		// 	pdopt.OutOpt = filetree.PListView
-		// } else
-		if isListTree {
-			if depth == 0 {
-				depth = -1
-			}
-			pdopt.OutOpt = filetree.PListTreeView
-		} else if isTree {
-			if depth == 0 {
-				depth = -1
-			}
-			pdopt.OutOpt = filetree.PTreeView
-		} else if isTable {
-			pdopt.OutOpt = filetree.PTableView
-		} else if isLevel {
-			pdopt.OutOpt = filetree.PLevelView
-		}
-		// else {
-		// 	pdopt.OutOpt = filetree.PListView
-		// }
+		// isList,	isListTree, isTree, isTable, isLevel, depth
+		ckView()
 
-		if isAllFiles {
-			pdopt.Ignore = func(f *filetree.File, e error) error {
-				return nil
-			}
+		// pattern
+		pflag := getpatflag()
+		switch pflag {
+		case allFlag:
+			optAllFiles()
+		case includeFlag:
+			optInclude()
+		case excludeFlag:
+			optExclude()
+		case allinclude:
+			optAllInclude()
+		case allexclude:
+			optAllExclude()
+		case allinAndexclude:
+			optAllInAndExclude()
+		case inAndexclude:
+			optInAndExclude()
 		}
-		if len(ignorePattern) > 0 {
-			re, err := regexp.Compile(ignorePattern)
-			if err != nil {
-				paw.Error.Printf("%s, error: %v", re.String(), err)
-				os.Exit(1)
-			}
-			pdopt.Ignore = func(f *filetree.File, e error) error {
-				if err != nil {
-					return err
-				}
-				_, file := filepath.Split(f.Path)
-				if paw.HasPrefix(file, ".") {
-					return filetree.SkipThis
-				}
-				if re.MatchString(f.BaseName) {
-					return filetree.SkipThis
-				}
-				return nil
-			}
-		}
-
-		if isAllFiles && len(ignorePattern) > 0 {
-			re, err := regexp.Compile(ignorePattern)
-			if err != nil {
-				paw.Error.Printf("%s, error: %v", re.String(), err)
-				os.Exit(1)
-			}
-			pdopt.Ignore = func(f *filetree.File, e error) error {
-				if err != nil {
-					return err
-				}
-				if re.MatchString(f.BaseName) {
-					return filetree.SkipThis
-				}
-				return nil
-			}
-		}
-
-		pdopt.Depth = depth
 
 		err := filetree.PrintDir(os.Stdout, path, pdopt, "")
 		if err != nil {
-			paw.Error.Printf("get file list from %q failed, error:%v", path, err)
+			paw.Error.Printf("get file list from %q failed, error: %v", path, err)
 			os.Exit(1)
 		}
 
 		return nil
 	}
+}
+
+func getpatflag() (pflag patflag) {
+	if isAllFiles && len(excludePattern) == 0 && len(includePattern) == 0 {
+		pflag = allFlag
+		goto END
+	}
+	if isAllFiles && len(excludePattern) > 0 && len(includePattern) == 0 {
+		pflag = allexclude
+		goto END
+	}
+	if isAllFiles && len(excludePattern) > 0 && len(includePattern) > 0 {
+		pflag = allinAndexclude
+		goto END
+	}
+	if isAllFiles && len(excludePattern) == 0 && len(includePattern) > 0 {
+		pflag = allinclude
+		goto END
+	}
+
+	if !isAllFiles && len(excludePattern) > 0 && len(includePattern) == 0 {
+		pflag = excludeFlag
+		goto END
+	}
+	if !isAllFiles && len(excludePattern) > 0 && len(includePattern) > 0 {
+		pflag = inAndexclude
+		goto END
+	}
+	if !isAllFiles && len(excludePattern) == 0 && len(includePattern) > 0 {
+		pflag = includeFlag
+		goto END
+	}
+END:
+	return pflag
+}
+
+func optAllInAndExclude() {
+	ren, err := regexp.Compile(includePattern)
+	if err != nil {
+		paw.Error.Printf("including pattern: %q, error: %v", ren.String(), err)
+		os.Exit(1)
+	}
+	rex, err := regexp.Compile(excludePattern)
+	if err != nil {
+		paw.Error.Printf("excluding pattern: %q, error: %v", rex.String(), err)
+		os.Exit(1)
+	}
+	pdopt.Ignore = func(f *filetree.File, e error) error {
+		if err != nil {
+			return err
+		}
+		if !f.IsDir() {
+			if !ren.MatchString(f.BaseName) && rex.MatchString(f.BaseName) {
+				return filetree.SkipThis
+			}
+		}
+		return nil
+	}
+}
+func optInAndExclude() {
+	ren, err := regexp.Compile(includePattern)
+	if err != nil {
+		paw.Error.Printf("including pattern: %q, error: %v", ren.String(), err)
+		os.Exit(1)
+	}
+	rex, err := regexp.Compile(excludePattern)
+	if err != nil {
+		paw.Error.Printf("excluding pattern: %q, error: %v", rex.String(), err)
+		os.Exit(1)
+	}
+	pdopt.Ignore = func(f *filetree.File, e error) error {
+		if err != nil {
+			return err
+		}
+		_, file := filepath.Split(f.Path)
+		if paw.HasPrefix(file, ".") {
+			return filetree.SkipThis
+		}
+		if !f.IsDir() {
+			if !ren.MatchString(f.BaseName) && rex.MatchString(f.BaseName) {
+				return filetree.SkipThis
+			}
+		}
+		return nil
+	}
+}
+func optAllInclude() {
+	re, err := regexp.Compile(includePattern)
+	if err != nil {
+		paw.Error.Printf("including pattern: %q, error: %v", re.String(), err)
+		os.Exit(1)
+	}
+	pdopt.Ignore = func(f *filetree.File, e error) error {
+		if err != nil {
+			return err
+		}
+		if !f.IsDir() {
+			if !re.MatchString(f.BaseName) {
+				return filetree.SkipThis
+			}
+		}
+		return nil
+	}
+}
+func optInclude() {
+	re, err := regexp.Compile(includePattern)
+	if err != nil {
+		paw.Error.Printf("including pattern: %q, error: %v", re.String(), err)
+		os.Exit(1)
+	}
+	pdopt.Ignore = func(f *filetree.File, e error) error {
+		if err != nil {
+			return err
+		}
+		_, file := filepath.Split(f.Path)
+		if paw.HasPrefix(file, ".") {
+			return filetree.SkipThis
+		}
+		if !f.IsDir() {
+			if !re.MatchString(f.BaseName) {
+				return filetree.SkipThis
+			}
+		}
+		return nil
+	}
+}
+func optAllExclude() {
+	re, err := regexp.Compile(excludePattern)
+	if err != nil {
+		paw.Error.Printf("excluding pattern: %q, error: %v", re.String(), err)
+		os.Exit(1)
+	}
+	pdopt.Ignore = func(f *filetree.File, e error) error {
+		if err != nil {
+			return err
+		}
+		if !f.IsDir() {
+			if re.MatchString(f.BaseName) {
+				return filetree.SkipThis
+			}
+		}
+		return nil
+	}
+}
+func optExclude() {
+	re, err := regexp.Compile(excludePattern)
+	if err != nil {
+		paw.Error.Printf("excluding pattern: %q, error: %v", re.String(), err)
+		os.Exit(1)
+	}
+	pdopt.Ignore = func(f *filetree.File, e error) error {
+		if err != nil {
+			return err
+		}
+		_, file := filepath.Split(f.Path)
+		if paw.HasPrefix(file, ".") {
+			return filetree.SkipThis
+		}
+		if !f.IsDir() {
+			if re.MatchString(f.BaseName) {
+				return filetree.SkipThis
+			}
+		}
+		return nil
+	}
+}
+func optAllFiles() {
+	pdopt.Ignore = func(f *filetree.File, e error) error {
+		return nil
+	}
+}
+
+func ckView() {
+	// if isList {
+	// 	pdopt.OutOpt = filetree.PListView
+	// } else
+	if isListTree {
+		if depth == 0 {
+			depth = -1
+		}
+		pdopt.OutOpt = filetree.PListTreeView
+	} else if isTree {
+		if depth == 0 {
+			depth = -1
+		}
+		pdopt.OutOpt = filetree.PTreeView
+	} else if isTable {
+		pdopt.OutOpt = filetree.PTableView
+	} else if isLevel {
+		pdopt.OutOpt = filetree.PLevelView
+	}
+	// else {
+	// 	pdopt.OutOpt = filetree.PListView
+	// }
+
+	pdopt.Depth = depth
+}
+
+func getPath(c *cli.Context) string {
+	path := c.Args().Get(0)
+	if len(path) == 0 {
+		path = "."
+	}
+	if paw.HasPrefix(path, "~") {
+		path, err = homedir.Expand(path)
+	} else {
+		path, err = filepath.Abs(path)
+	}
+	if err != nil || !paw.IsExist(path) {
+		// paw.Error.Printf("%q error: %v", path, err)
+		paw.Error.Printf("%q does not exist or error: %v", path, err)
+		os.Exit(1)
+	}
+	return path
 }
 
 func main() {
