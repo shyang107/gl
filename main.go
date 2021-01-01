@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	version = "0.0.2"
+	version = "0.0.3"
 )
 
 var (
@@ -61,6 +61,7 @@ func init() {
 
 	app.Flags = []cli.Flag{
 		&listFlag, &listTreeFlag, &treeFlag, &tableFlag, &levelFlag, &clsassifyFlag, &depthFlag, &recurseFlag, &allFilesFlag, &includePatternFlag, &excludePatternFlag,
+		&isSortByNameFlag, &isReverseFlag, &isSortBySizeFlag, &isSortByMTimeFlag,
 	}
 
 	app.Action = appAction

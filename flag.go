@@ -18,6 +18,10 @@ type gloption struct {
 	isAllFiles     bool
 	includePattern string
 	excludePattern string
+	isSortByName   bool //default name
+	isReverse      bool
+	isSortBySize   bool
+	isSortByMTime  bool
 }
 
 var (
@@ -101,5 +105,34 @@ var (
 		Value:       "",
 		Usage:       "set regex `pattern` to exclude some files, applied to file only",
 		Destination: &opt.excludePattern,
+	}
+
+	isSortByNameFlag = cli.BoolFlag{
+		Name:        "sort-by-name",
+		Aliases:     []string{"s"},
+		Value:       false,
+		Usage:       "sort by name in increasing order (single key)",
+		Destination: &opt.isSortByName,
+	}
+	isReverseFlag = cli.BoolFlag{
+		Name:        "reverse",
+		Aliases:     []string{"r"},
+		Value:       false,
+		Usage:       "sort in decreasing order, default sort by name",
+		Destination: &opt.isReverse,
+	}
+	isSortBySizeFlag = cli.BoolFlag{
+		Name:        "sort-by-size",
+		Aliases:     []string{"z"},
+		Value:       false,
+		Usage:       "sort by size in increasing order (single key)",
+		Destination: &opt.isSortBySize,
+	}
+	isSortByMTimeFlag = cli.BoolFlag{
+		Name:        "sort-by-mtime",
+		Aliases:     []string{"m"},
+		Value:       false,
+		Usage:       "sort by modified time in increasing order (single key)",
+		Destination: &opt.isSortByMTime,
 	}
 )
