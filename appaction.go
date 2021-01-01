@@ -33,7 +33,9 @@ var appAction = func(c *cli.Context) error {
 		optInAndExclude(opt, pdopt)
 	}
 
-	err := filetree.PrintDir(os.Stdout, opt.path, pdopt, "")
+	sortOpt := getSortOption(opt)
+
+	err := filetree.PrintDir(os.Stdout, opt.path, pdopt, sortOpt, "")
 	if err != nil {
 		paw.Error.Printf("get file list from %q failed, error: %v", opt.path, err)
 		os.Exit(1)
