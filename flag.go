@@ -24,6 +24,7 @@ type gloption struct {
 	isSortBySize   bool
 	isSortByMTime  bool
 	isGrouped      bool
+	isExtended     bool
 }
 
 var (
@@ -151,5 +152,13 @@ var (
 		Value:       false,
 		Usage:       "group files and directories separately",
 		Destination: &opt.isGrouped,
+	}
+
+	isExtendedFlag = cli.BoolFlag{
+		Name:        "extended",
+		Aliases:     []string{"@"},
+		Value:       false,
+		Usage:       "list each file's extended attributes and sizes",
+		Destination: &opt.isExtended,
 	}
 )

@@ -22,6 +22,10 @@ func ckView(opt *gloption, pdopt *filetree.PrintDirOption) {
 		pdopt.OutOpt = filetree.PClassifyView
 	}
 
+	if opt.isExtended {
+		pdopt.OutOpt = filetree.PListExtendView
+	}
+
 	if opt.isRecurse {
 		opt.depth = -1
 	}

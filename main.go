@@ -63,6 +63,7 @@ func init() {
 		&listFlag, &listTreeFlag, &treeFlag, &tableFlag, &levelFlag, &clsassifyFlag, &depthFlag, &recurseFlag, &allFilesFlag, &includePatternFlag, &excludePatternFlag,
 		&isNoSortFlag, &isReverseFlag, &isSortByNameFlag, &isSortBySizeFlag, &isSortByMTimeFlag,
 		&isGroupedFlag,
+		&isExtendedFlag,
 	}
 
 	app.Action = appAction
