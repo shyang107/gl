@@ -62,6 +62,7 @@ func init() {
 	app.Flags = []cli.Flag{
 		&listFlag, &listTreeFlag, &treeFlag, &tableFlag, &levelFlag, &clsassifyFlag, &depthFlag, &recurseFlag, &allFilesFlag, &includePatternFlag, &excludePatternFlag,
 		&isNoSortFlag, &isReverseFlag, &isSortByNameFlag, &isSortBySizeFlag, &isSortByMTimeFlag,
+		&isGroupedFlag,
 	}
 
 	app.Action = appAction

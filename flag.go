@@ -23,6 +23,7 @@ type gloption struct {
 	isSortByName   bool //default name
 	isSortBySize   bool
 	isSortByMTime  bool
+	isGrouped      bool
 }
 
 var (
@@ -142,5 +143,13 @@ var (
 		Value:       false,
 		Usage:       "sort by modified time in increasing order (single key)",
 		Destination: &opt.isSortByMTime,
+	}
+
+	isGroupedFlag = cli.BoolFlag{
+		Name:        "grouped",
+		Aliases:     []string{"g"},
+		Value:       false,
+		Usage:       "group files and directories separately",
+		Destination: &opt.isGrouped,
 	}
 )
