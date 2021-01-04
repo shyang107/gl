@@ -13,24 +13,24 @@ var (
 	}
 )
 
-func getSortOption(opt *gloption) *filetree.PDirSortOption {
+func getSortOption(opt *gloption) *filetree.PrintDirSortOption {
 	if opt.isNoSort {
-		return &filetree.PDirSortOption{
+		return &filetree.PrintDirSortOption{
 			IsSort: !opt.isNoSort,
 		}
 	}
 
-	// var sortOpt *filetree.PDirSortOption
+	// var sortOpt *filetree.PrintDirSortOption
 	if opt.isSortBySize {
 		// paw.Info.Println("opt.isSortBySize", opt.isSortBySize)
 		// paw.Info.Println("  opt.isReverse", opt.isReverse)
 		if opt.isReverse {
-			return &filetree.PDirSortOption{
+			return &filetree.PrintDirSortOption{
 				IsSort:  true,
 				SortWay: filetree.PDSortByReverseSize,
 			}
 		} else {
-			return &filetree.PDirSortOption{
+			return &filetree.PrintDirSortOption{
 				IsSort:  true,
 				SortWay: filetree.PDSortBySize,
 			}
@@ -40,12 +40,12 @@ func getSortOption(opt *gloption) *filetree.PDirSortOption {
 		// paw.Info.Println("opt.isSortByMTime", opt.isSortByMTime)
 		// paw.Info.Println("  opt.isReverse", opt.isReverse)
 		if opt.isReverse {
-			return &filetree.PDirSortOption{
+			return &filetree.PrintDirSortOption{
 				IsSort:  true,
 				SortWay: filetree.PDSortByReverseMtime,
 			}
 		} else {
-			return &filetree.PDirSortOption{
+			return &filetree.PrintDirSortOption{
 				IsSort:  true,
 				SortWay: filetree.PDSortByMtime,
 			}
@@ -56,12 +56,12 @@ func getSortOption(opt *gloption) *filetree.PDirSortOption {
 	// paw.Info.Println("opt.isSortByName", opt.isSortByName)
 	// paw.Info.Println("  opt.isReverse", opt.isReverse)
 	if opt.isReverse {
-		return &filetree.PDirSortOption{
+		return &filetree.PrintDirSortOption{
 			IsSort:  true,
 			SortWay: filetree.PDSortByReverseName,
 		}
 	} else {
-		return &filetree.PDirSortOption{
+		return &filetree.PrintDirSortOption{
 			IsSort:  true,
 			SortWay: filetree.PDSortByName,
 		}

@@ -18,13 +18,18 @@ type gloption struct {
 	isAllFiles     bool
 	includePattern string
 	excludePattern string
-	isNoSort       bool
-	isReverse      bool
-	isSortByName   bool //default name
-	isSortBySize   bool
-	isSortByMTime  bool
-	isGrouped      bool
-	isExtended     bool
+
+	isNoEmptyDirs bool
+	isJustFiles   bool
+	isJustDirs    bool
+
+	isNoSort      bool
+	isReverse     bool
+	isSortByName  bool //default name
+	isSortBySize  bool
+	isSortByMTime bool
+	isGrouped     bool
+	isExtended    bool
 }
 
 var (
@@ -69,7 +74,7 @@ var (
 	}
 	clsassifyFlag = cli.BoolFlag{
 		Name:        "classify",
-		Aliases:     []string{"F"},
+		Aliases:     []string{"f"},
 		Value:       false,
 		Usage:       "display type indicator by file names",
 		Destination: &opt.isClassify,
@@ -92,7 +97,7 @@ var (
 		Name:        "all",
 		Aliases:     []string{"a"},
 		Value:       false,
-		Usage:       "show all file including hidden files",
+		Usage:       "show all files including hidden files",
 		Destination: &opt.isAllFiles,
 	}
 	includePatternFlag = cli.StringFlag{
@@ -108,6 +113,28 @@ var (
 		Value:       "",
 		Usage:       "set regex `pattern` to exclude some files, applied to file only",
 		Destination: &opt.excludePattern,
+	}
+
+	isNoEmptyDirsFlag = cli.BoolFlag{
+		Name:        "no-empty-dirs",
+		Aliases:     []string{"O"},
+		Value:       false,
+		Usage:       "show all files but not empty directories",
+		Destination: &opt.isNoEmptyDirs,
+	}
+	isJustFilesFlag = cli.BoolFlag{
+		Name:        "just-files",
+		Aliases:     []string{"F"},
+		Value:       false,
+		Usage:       "show all files but not directories, has high priority than --just-dirs",
+		Destination: &opt.isJustFiles,
+	}
+	isJustDirsFlag = cli.BoolFlag{
+		Name:        "just-dirs",
+		Aliases:     []string{"D"},
+		Value:       false,
+		Usage:       "show all dirs but not files",
+		Destination: &opt.isJustDirs,
 	}
 
 	isNoSortFlag = cli.BoolFlag{
