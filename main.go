@@ -5,7 +5,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/fatih/color"
 	"github.com/shyang107/paw/filetree"
 
 	"github.com/shyang107/paw"
@@ -14,7 +13,7 @@ import (
 )
 
 const (
-	version = "0.0.4"
+	version = "0.0.5"
 )
 
 var (
@@ -44,7 +43,7 @@ func init() {
 	app.ArgsUsage = "[path]"
 
 	cli.VersionPrinter = func(c *cli.Context) {
-		fmt.Printf("%s version %s @ %v\n", c.App.Name, color.New(color.FgHiGreen).Sprint(c.App.Version), filetree.NewEXAColor("da").Sprint(c.App.Compiled.Format("Jan 2, 2006")))
+		fmt.Printf("%s version %s @ %v\n", c.App.Name, filetree.NewEXAColor("sb").Sprint(c.App.Version), filetree.NewEXAColor("da").Sprint(c.App.Compiled.Format("Jan 2, 2006")))
 	}
 
 	app.Commands = []*cli.Command{
@@ -72,9 +71,15 @@ func init() {
 }
 
 func main() {
+	// start := time.Now()
+
 	err := app.Run(os.Args)
 	if err != nil {
 		paw.Error.Printf("run '%s' failed, error:%v", app.Name, err)
 		os.Exit(1)
 	}
+
+	// elapsedTime := time.Since(start)
+	// fmt.Println()
+	// fmt.Println("Total time for excution:", elapsedTime.String())
 }

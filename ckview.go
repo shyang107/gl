@@ -26,6 +26,12 @@ func ckView(opt *gloption, pdopt *filetree.PrintDirOption) {
 		switch {
 		case pdopt.OutOpt == filetree.PLevelView:
 			pdopt.OutOpt = filetree.PLevelExtendView
+		case pdopt.OutOpt == filetree.PTableView:
+			pdopt.OutOpt = filetree.PTableExtendView
+		case pdopt.OutOpt == filetree.PTreeView:
+			pdopt.OutOpt = filetree.PTreeExtendView
+		case pdopt.OutOpt == filetree.PListTreeView:
+			pdopt.OutOpt = filetree.PListTreeExtendView
 		default:
 			pdopt.OutOpt = filetree.PListExtendView
 		}
