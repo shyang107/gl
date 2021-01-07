@@ -3,9 +3,9 @@ package main
 import (
 	"fmt"
 	"os"
-	"time"
 
 	"github.com/shyang107/paw/filetree"
+	"github.com/spf13/cast"
 
 	"github.com/shyang107/paw"
 	_ "github.com/shyang107/paw"
@@ -33,7 +33,8 @@ func init() {
 	app.Name = "gl"
 	app.Usage = "list directory (excluding hidden items) in color view."
 	app.Version = version
-	app.Compiled = time.Now()
+	// app.Compiled = time.Now()
+	app.Compiled = cast.ToTime("2021-01-07")
 	app.Authors = []*cli.Author{
 		&cli.Author{
 			Name:  "Shuhhua Yang",

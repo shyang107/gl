@@ -155,6 +155,7 @@ func optInclude(opt *gloption, pdopt *filetree.PrintDirOption) {
 		return nil
 	}
 }
+
 func optAllExclude(opt *gloption, pdopt *filetree.PrintDirOption) {
 	re, err := regexp.Compile(opt.excludePattern)
 	if err != nil {
@@ -173,6 +174,7 @@ func optAllExclude(opt *gloption, pdopt *filetree.PrintDirOption) {
 		return nil
 	}
 }
+
 func optExclude(opt *gloption, pdopt *filetree.PrintDirOption) {
 	re, err := regexp.Compile(opt.excludePattern)
 	if err != nil {
@@ -195,6 +197,7 @@ func optExclude(opt *gloption, pdopt *filetree.PrintDirOption) {
 		return nil
 	}
 }
+
 func optAllFiles(opt *gloption, pdopt *filetree.PrintDirOption) {
 	pdopt.Ignore = func(f *filetree.File, e error) error {
 		return nil
