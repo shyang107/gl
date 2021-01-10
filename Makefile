@@ -1,8 +1,9 @@
 .DEFAULT_GOAL := buildandrun
 BIN_FILE=gl
+D=
 buildandrun:
 	@go build -o "${BIN_FILE}"
-	./"${BIN_FILE}"
+	./"${BIN_FILE}" "${D}"
 
 build:
 	@go build -o "${BIN_FILE}"
