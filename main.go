@@ -63,9 +63,16 @@ func init() {
 		&listFlag, &listTreeFlag, &treeFlag, &tableFlag, &levelFlag, &clsassifyFlag, &depthFlag, &recurseFlag,
 		&allFilesFlag, &includePatternFlag, &excludePatternFlag,
 		&isNoEmptyDirsFlag, &isJustDirsFlag, &isJustFilesFlag,
-		&isNoSortFlag, &isReverseFlag, &isSortByNameFlag, &isSortBySizeFlag, &isSortByMTimeFlag,
-		&isGroupedFlag,
+		&isFieldINodeFlag, &isFieldLinksFlag,
+		// &isFieldPermissionsFlag,
+		// &isFieldSizeFlag,
+		&isFieldBlocksFlag,
+		// &isFieldUserFlag, &isFieldGroupFlag,
+		&isModifiedFlag, &isAccessedFlag, &isCreatedFlag,
+		&isFieldGitFlag,
 		&isExtendedFlag,
+		&isNoSortFlag, &isReverseFlag, &sortByFieldFlag, &isSortByNameFlag, &isSortBySizeFlag, &isSortByMTimeFlag,
+		&isGroupedFlag,
 	}
 
 	app.Action = appAction

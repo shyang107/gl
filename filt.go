@@ -4,9 +4,9 @@ import (
 	"github.com/shyang107/paw/filetree"
 )
 
-func getFiltOption(opt *gloption) *filetree.PrintDirFilterOption {
+func getFiltOption(opt *gloption) *filetree.PDFilterOption {
 
-	filtOpt := &filetree.PrintDirFilterOption{
+	filtOpt := &filetree.PDFilterOption{
 		IsFilt: false,
 	}
 
