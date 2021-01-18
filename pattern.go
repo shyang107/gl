@@ -80,11 +80,14 @@ func optAllInAndExclude(opt *gloption, pdopt *filetree.PrintDirOption) {
 		if err != nil {
 			return err
 		}
-		if !f.IsDir() {
-			if !ren.MatchString(f.BaseName) && rex.MatchString(f.BaseName) {
-				return filetree.SkipThis
-			}
+		if !ren.MatchString(f.BaseName) && rex.MatchString(f.BaseName) {
+			return filetree.SkipThis
 		}
+		// if !f.IsDir() {
+		// 	if !ren.MatchString(f.BaseName) && rex.MatchString(f.BaseName) {
+		// 		return filetree.SkipThis
+		// 	}
+		// }
 		return nil
 	}
 }
@@ -107,11 +110,14 @@ func optInAndExclude(opt *gloption, pdopt *filetree.PrintDirOption) {
 		if paw.HasPrefix(file, ".") {
 			return filetree.SkipThis
 		}
-		if !f.IsDir() {
-			if !ren.MatchString(f.BaseName) && rex.MatchString(f.BaseName) {
-				return filetree.SkipThis
-			}
+		if !ren.MatchString(f.BaseName) && rex.MatchString(f.BaseName) {
+			return filetree.SkipThis
 		}
+		// if !f.IsDir() {
+		// 	if !ren.MatchString(f.BaseName) && rex.MatchString(f.BaseName) {
+		// 		return filetree.SkipThis
+		// 	}
+		// }
 		return nil
 	}
 }
@@ -125,11 +131,14 @@ func optAllInclude(opt *gloption, pdopt *filetree.PrintDirOption) {
 		if err != nil {
 			return err
 		}
-		if !f.IsDir() {
-			if !re.MatchString(f.BaseName) {
-				return filetree.SkipThis
-			}
+		if !re.MatchString(f.BaseName) {
+			return filetree.SkipThis
 		}
+		// if !f.IsDir() {
+		// 	if !re.MatchString(f.BaseName) {
+		// 		return filetree.SkipThis
+		// 	}
+		// }
 		return nil
 	}
 }
@@ -147,11 +156,14 @@ func optInclude(opt *gloption, pdopt *filetree.PrintDirOption) {
 		if paw.HasPrefix(file, ".") {
 			return filetree.SkipThis
 		}
-		if !f.IsDir() {
-			if !re.MatchString(f.BaseName) {
-				return filetree.SkipThis
-			}
+		if !re.MatchString(f.BaseName) {
+			return filetree.SkipThis
 		}
+		// if !f.IsDir() {
+		// 	if !re.MatchString(f.BaseName) {
+		// 		return filetree.SkipThis
+		// 	}
+		// }
 		return nil
 	}
 }
@@ -166,11 +178,14 @@ func optAllExclude(opt *gloption, pdopt *filetree.PrintDirOption) {
 		if err != nil {
 			return err
 		}
-		if !f.IsDir() {
-			if re.MatchString(f.BaseName) {
-				return filetree.SkipThis
-			}
+		if re.MatchString(f.BaseName) {
+			return filetree.SkipThis
 		}
+		// if !f.IsDir() {
+		// 	if re.MatchString(f.BaseName) {
+		// 		return filetree.SkipThis
+		// 	}
+		// }
 		return nil
 	}
 }
@@ -189,11 +204,14 @@ func optExclude(opt *gloption, pdopt *filetree.PrintDirOption) {
 		if paw.HasPrefix(file, ".") {
 			return filetree.SkipThis
 		}
-		if !f.IsDir() {
-			if re.MatchString(f.BaseName) {
-				return filetree.SkipThis
-			}
+		if re.MatchString(f.BaseName) {
+			return filetree.SkipThis
 		}
+		// if !f.IsDir() {
+		// 	if re.MatchString(f.BaseName) {
+		// 		return filetree.SkipThis
+		// 	}
+		// }
 		return nil
 	}
 }

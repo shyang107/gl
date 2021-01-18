@@ -123,7 +123,7 @@ var (
 	}
 	excludePatternFlag = cli.StringFlag{
 		Name:        "exclude",
-		Aliases:     []string{"re"},
+		Aliases:     []string{"rx"},
 		Value:       "",
 		Usage:       "set regex `pattern` to exclude some files, applied to file only",
 		Destination: &opt.excludePattern,
