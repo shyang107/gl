@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/shyang107/paw/filetree"
 	"github.com/spf13/cast"
 
 	"github.com/shyang107/paw"
@@ -13,7 +12,7 @@ import (
 )
 
 const (
-	version = "0.0.6"
+	version = "0.0.7"
 )
 
 var (
@@ -34,7 +33,7 @@ func init() {
 	app.Usage = "list directory (excluding hidden items) in color view."
 	app.Version = version
 	// app.Compiled = time.Now()
-	app.Compiled = cast.ToTime("2021-01-10")
+	app.Compiled = cast.ToTime("2021-01-21")
 	app.Authors = []*cli.Author{
 		&cli.Author{
 			Name:  "Shuhhua Yang",
@@ -44,7 +43,7 @@ func init() {
 	app.ArgsUsage = "[path]"
 
 	cli.VersionPrinter = func(c *cli.Context) {
-		fmt.Printf("%s version %s @ %v\n", c.App.Name, filetree.NewEXAColor("sb").Sprint(c.App.Version), filetree.NewEXAColor("da").Sprint(c.App.Compiled.Format("Jan 2, 2006")))
+		fmt.Printf("%s version %s @ %v\n", c.App.Name, paw.NewEXAColor("sb").Sprint(c.App.Version), paw.NewEXAColor("da").Sprint(c.App.Compiled.Format("Jan 2, 2006")))
 	}
 
 	app.Commands = []*cli.Command{
