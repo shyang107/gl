@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/mitchellh/go-homedir"
 	"github.com/shyang107/paw"
@@ -14,7 +15,7 @@ func getPath(c *cli.Context) string {
 	if len(path) == 0 {
 		path = "."
 	}
-	if paw.HasPrefix(path, "~") {
+	if strings.HasPrefix(path, "~") {
 		path, err = homedir.Expand(path)
 	} else {
 		path, err = filepath.Abs(path)

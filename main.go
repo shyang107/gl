@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	version = "0.0.7"
+	version = "0.0.7.1"
 )
 
 var (
@@ -33,7 +33,7 @@ func init() {
 	app.Usage = "list directory (excluding hidden items) in color view."
 	app.Version = version
 	// app.Compiled = time.Now()
-	app.Compiled = cast.ToTime("2021-01-21")
+	app.Compiled = cast.ToTime("2021-01-27")
 	app.Authors = []*cli.Author{
 		&cli.Author{
 			Name:  "Shuhhua Yang",

@@ -4,6 +4,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
 
 	"github.com/shyang107/paw"
 	"github.com/shyang107/paw/filetree"
@@ -107,7 +108,7 @@ func optInAndExclude(opt *gloption, pdopt *filetree.PrintDirOption) {
 			return err
 		}
 		_, file := filepath.Split(f.Path)
-		if paw.HasPrefix(file, ".") {
+		if strings.HasPrefix(file, ".") {
 			return filetree.SkipThis
 		}
 		if !ren.MatchString(f.BaseName) && rex.MatchString(f.BaseName) {
@@ -153,7 +154,7 @@ func optInclude(opt *gloption, pdopt *filetree.PrintDirOption) {
 			return err
 		}
 		_, file := filepath.Split(f.Path)
-		if paw.HasPrefix(file, ".") {
+		if strings.HasPrefix(file, ".") {
 			return filetree.SkipThis
 		}
 		if !re.MatchString(f.BaseName) {
@@ -201,7 +202,7 @@ func optExclude(opt *gloption, pdopt *filetree.PrintDirOption) {
 			return err
 		}
 		_, file := filepath.Split(f.Path)
-		if paw.HasPrefix(file, ".") {
+		if strings.HasPrefix(file, ".") {
 			return filetree.SkipThis
 		}
 		if re.MatchString(f.BaseName) {

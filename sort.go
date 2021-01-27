@@ -1,7 +1,8 @@
 package main
 
 import (
-	"github.com/shyang107/paw"
+	"strings"
+
 	"github.com/shyang107/paw/filetree"
 )
 
@@ -38,7 +39,7 @@ var (
 		// } else if fi.IsFile() && fj.IsDir() {
 		// 	return false
 		// }
-		return paw.ToLower(fi.BaseName) < paw.ToLower(fj.BaseName)
+		return strings.ToLower(fi.BaseName) < strings.ToLower(fj.BaseName)
 	}
 	byNameR filetree.FilesBy = func(fi, fj *filetree.File) bool {
 		// if fi.IsDir() && fj.IsFile() {
@@ -46,7 +47,7 @@ var (
 		// } else if fi.IsFile() && fj.IsDir() {
 		// 	return false
 		// }
-		return paw.ToLower(fi.BaseName) > paw.ToLower(fj.BaseName)
+		return strings.ToLower(fi.BaseName) > strings.ToLower(fj.BaseName)
 	}
 
 	sortedFields = []string{"size", "modified", "accessed", "created", "name"}
