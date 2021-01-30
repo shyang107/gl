@@ -122,5 +122,5 @@ func getSortOption(opt *gloption) *filetree.PDSortOption {
 	}
 	// }
 
-	return nil
+	// return nil
 }

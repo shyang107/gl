@@ -9,10 +9,11 @@ import (
 )
 
 var appAction = func(c *cli.Context) error {
-	opt.path = getPath(c)
+
+	checkArgs(c, pdopt)
 
 	// isList,	isListTree, isTree, isTable, isLevel, depth
-	ckView(opt, pdopt)
+	checkView(opt, pdopt)
 
 	// pattern
 	pflag := getpatflag(opt)

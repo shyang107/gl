@@ -35,7 +35,7 @@ func init() {
 	// app.Compiled = time.Now()
 	app.Compiled = cast.ToTime("2021-01-27")
 	app.Authors = []*cli.Author{
-		&cli.Author{
+		{
 			Name:  "Shuhhua Yang",
 			Email: "shyang107@gmail.com",
 		},
@@ -47,7 +47,7 @@ func init() {
 	}
 
 	app.Commands = []*cli.Command{
-		&cli.Command{
+		{
 			Name:    "version",
 			Aliases: []string{"v", "V"},
 			Usage:   "print only the version",

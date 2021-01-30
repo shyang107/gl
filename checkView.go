@@ -2,7 +2,7 @@ package main
 
 import "github.com/shyang107/paw/filetree"
 
-func ckView(opt *gloption, pdopt *filetree.PrintDirOption) {
+func checkView(opt *gloption, pdopt *filetree.PrintDirOption) {
 
 	if opt.isListTree {
 		if opt.depth == 0 {
