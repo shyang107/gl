@@ -31,6 +31,7 @@ func init() {
 
 	app.Name = "gl"
 	app.Usage = "list directory (excluding hidden items) in color view."
+	app.UsageText = "web-gl command [command options] [arguments...]"
 	app.Version = version
 	// app.Compiled = time.Now()
 	app.Compiled = cast.ToTime("2021-01-27")
@@ -45,6 +46,10 @@ func init() {
 	cli.VersionPrinter = func(c *cli.Context) {
 		fmt.Printf("%s version %s @ %v\n", c.App.Name, paw.NewEXAColor("sb").Sprint(c.App.Version), paw.NewEXAColor("da").Sprint(c.App.Compiled.Format("Jan 2, 2006")))
 	}
+
+	app.EnableBashCompletion = true
+
+	app.UseShortOptionHandling = true
 
 	app.Commands = []*cli.Command{
 		{
