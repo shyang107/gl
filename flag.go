@@ -168,7 +168,7 @@ var (
 	sortByFieldFlag = cli.StringFlag{
 		Name:        "sort",
 		Aliases:     []string{"sf"},
-		Value:       "name",
+		Value:       "",
 		Usage:       "which single `field` to sort by. (field: inode, links, block, size, mtime (ot modified), atime (or accessed), ctime (or created), name; «field»[R]: reverse sort)",
 		Destination: &opt.sortByField,
 	}
