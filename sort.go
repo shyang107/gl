@@ -3,69 +3,36 @@ package main
 import (
 	"strings"
 
+	"github.com/shyang107/paw"
 	"github.com/shyang107/paw/filetree"
 )
 
 var (
-	bySize filetree.FilesBy = func(fi, fj *filetree.File) bool {
-		return fi.Size < fj.Size
-	}
-	bySizeR filetree.FilesBy = func(fi, fj *filetree.File) bool {
-		return fi.Size > fj.Size
-	}
-
-	byMTime filetree.FilesBy = func(fi, fj *filetree.File) bool {
-		return fi.ModifiedTime().Before(fj.ModifiedTime())
-	}
-	byMTimeR filetree.FilesBy = func(fi, fj *filetree.File) bool {
-		return fi.ModifiedTime().After(fj.ModifiedTime())
-	}
-	byATime filetree.FilesBy = func(fi, fj *filetree.File) bool {
-		return fi.AccessedTime().Before(fj.AccessedTime())
-	}
-	byATimeR filetree.FilesBy = func(fi, fj *filetree.File) bool {
-		return fi.AccessedTime().After(fj.AccessedTime())
-	}
-	byCTime filetree.FilesBy = func(fi, fj *filetree.File) bool {
-		return fi.CreatedTime().Before(fj.CreatedTime())
-	}
-	byCTimeR filetree.FilesBy = func(fi, fj *filetree.File) bool {
-		return fi.CreatedTime().After(fj.CreatedTime())
-	}
-
-	byName filetree.FilesBy = func(fi, fj *filetree.File) bool {
-		// if fi.IsDir() && fj.IsFile() {
-		// 	return true
-		// } else if fi.IsFile() && fj.IsDir() {
-		// 	return false
-		// }
-		return strings.ToLower(fi.BaseName) < strings.ToLower(fj.BaseName)
-	}
-	byNameR filetree.FilesBy = func(fi, fj *filetree.File) bool {
-		// if fi.IsDir() && fj.IsFile() {
-		// 	return true
-		// } else if fi.IsFile() && fj.IsDir() {
-		// 	return false
-		// }
-		return strings.ToLower(fi.BaseName) > strings.ToLower(fj.BaseName)
-	}
-
-	sortedFields = []string{"size", "modified", "accessed", "created", "name"}
-	sortBy       = map[string]filetree.FilesBy{
-		"size":             bySize,
-		"modified":         byMTime,
-		"accessed":         byATime,
-		"created":          byCTime,
-		"name":             byName,
-		"reverse_size":     bySizeR,
-		"reverse_modified": byMTimeR,
-		"reverse_accessed": byATimeR,
-		"reverse_created":  byCTimeR,
-		"reverse_name":     byNameR,
+	sortMapFlag = map[string]filetree.PDSortFlag{
+		"inode":     filetree.PDSortByINode,
+		"links":     filetree.PDSortByLinks,
+		"size":      filetree.PDSortBySize,
+		"blocks":    filetree.PDSortByBlocks,
+		"modified":  filetree.PDSortByMTime,
+		"mtime":     filetree.PDSortByMTime,
+		"accessed":  filetree.PDSortByATime,
+		"atime":     filetree.PDSortByATime,
+		"created":   filetree.PDSortByCTime,
+		"ctime":     filetree.PDSortByCTime,
+		"name":      filetree.PDSortByName,
+		"inoder":    filetree.PDSortByINodeR,
+		"linksr":    filetree.PDSortByLinksR,
+		"sizer":     filetree.PDSortBySizeR,
+		"blocksr":   filetree.PDSortByBlocksR,
+		"modifiedr": filetree.PDSortByMTimeR,
+		"mtimer":    filetree.PDSortByMTimeR,
+		"accessedr": filetree.PDSortByATimeR,
+		"atimer":    filetree.PDSortByATimeR,
+		"createdr":  filetree.PDSortByCTimeR,
+		"ctimer":    filetree.PDSortByCTimeR,
+		"namer":     filetree.PDSortByNameR,
 	}
 )
-
-// TODO sortByField
 
 func getSortOption(opt *gloption) *filetree.PDSortOption {
 	if opt.isNoSort {
@@ -73,54 +40,44 @@ func getSortOption(opt *gloption) *filetree.PDSortOption {
 			IsSort: !opt.isNoSort,
 		}
 	}
+	var sflag = strings.ToLower(opt.sortByField)
+	if len(sflag) > 0 {
+		if strings.HasSuffix(sflag, "r") {
+			opt.isReverse = true
+		}
+		if opt.isReverse && !strings.HasSuffix(sflag, "r") {
+			sflag += "r"
+		}
+		if flag, ok := sortMapFlag[sflag]; ok {
+			return &filetree.PDSortOption{
+				IsSort:  true,
+				SortWay: flag,
+			}
+		} else {
+			paw.Error.Printf("%q is not allowed; so, sort by name in increasing order!\n", opt.sortByField)
+			flag = sortMapFlag["name"]
+			return &filetree.PDSortOption{
+				IsSort:  true,
+				SortWay: flag,
+			}
+		}
+	}
 
 	// var sortOpt *filetree.PDSortOption
 	if opt.isSortBySize {
-		// paw.Info.Println("opt.isSortBySize", opt.isSortBySize)
-		// paw.Info.Println("  opt.isReverse", opt.isReverse)
-		if opt.isReverse {
-			return &filetree.PDSortOption{
-				IsSort:  true,
-				SortWay: filetree.PDSortByReverseSize,
-			}
-		} else {
-			return &filetree.PDSortOption{
-				IsSort:  true,
-				SortWay: filetree.PDSortBySize,
-			}
-		}
-	}
-	if opt.isSortByMTime {
-		// paw.Info.Println("opt.isSortByMTime", opt.isSortByMTime)
-		// paw.Info.Println("  opt.isReverse", opt.isReverse)
-		if opt.isReverse {
-			return &filetree.PDSortOption{
-				IsSort:  true,
-				SortWay: filetree.PDSortByReverseMtime,
-			}
-		} else {
-			return &filetree.PDSortOption{
-				IsSort:  true,
-				SortWay: filetree.PDSortByMtime,
-			}
-		}
-	}
-	// if opt.isSortByName { //default
-	opt.isSortByName = true
-	// paw.Info.Println("opt.isSortByName", opt.isSortByName)
-	// paw.Info.Println("  opt.isReverse", opt.isReverse)
-	if opt.isReverse {
-		return &filetree.PDSortOption{
-			IsSort:  true,
-			SortWay: filetree.PDSortByReverseName,
-		}
+		sflag = "size"
+	} else if opt.isSortByMTime {
+		sflag = "mtime"
 	} else {
-		return &filetree.PDSortOption{
-			IsSort:  true,
-			SortWay: filetree.PDSortByName,
-		}
+		opt.isSortByName = true
+		sflag = "name"
 	}
-	// }
+	if opt.isReverse {
+		sflag += "r"
+	}
 
-	// return nil
+	return &filetree.PDSortOption{
+		IsSort:  true,
+		SortWay: sortMapFlag[sflag],
+	}
 }

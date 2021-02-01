@@ -165,12 +165,11 @@ var (
 		Usage:       "sort in decreasing order, default sort by name",
 		Destination: &opt.isReverse,
 	}
-	// TODO sortByField
 	sortByFieldFlag = cli.StringFlag{
 		Name:        "sort",
-		Aliases:     []string{"s"},
+		Aliases:     []string{"sf"},
 		Value:       "name",
-		Usage:       "which `field` to sort by. (field: size, modified, accessed, created, name)",
+		Usage:       "which single `field` to sort by. (field: inode, links, block, size, mtime (ot modified), atime (or accessed), ctime (or created), name; «field»[R]: reverse sort)",
 		Destination: &opt.sortByField,
 	}
 	isSortByNameFlag = cli.BoolFlag{
