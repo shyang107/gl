@@ -47,7 +47,7 @@ func init() {
 		fmt.Printf("%s version %s @ %v\n", c.App.Name, paw.NewEXAColor("sb").Sprint("gl"+c.App.Version), paw.NewEXAColor("da").Sprint(c.App.Compiled.Format("Jan 2, 2006")))
 	}
 
-	app.EnableBashCompletion = true
+	// app.EnableBashCompletion = true
 
 	app.UseShortOptionHandling = true
 
