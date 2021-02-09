@@ -1,11 +1,10 @@
 package main
 
 import (
-	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
 
-	"github.com/shyang107/paw"
 	"github.com/shyang107/paw/filetree"
 )
 
@@ -22,23 +21,39 @@ const (
 )
 
 func getpatflag(opt *gloption) (pflag patflag) {
-	if opt.isAllFiles && len(opt.excludePattern) == 0 && len(opt.includePattern) == 0 {
+	var ri, rx *regexp.Regexp
+	if len(opt.includePattern) > 0 {
+		ri, _ = regexp.Compile(opt.includePattern)
+	}
+	if len(opt.excludePattern) > 0 {
+		rx, _ = regexp.Compile(opt.excludePattern)
+	}
+
+	if opt.isAllFiles &&
+		len(opt.excludePattern) == 0 &&
+		len(opt.includePattern) == 0 {
+		info("[getpatflag] pattern: all")
 		pflag = allFlag
 		goto END
 	}
-	if opt.isAllFiles && len(opt.excludePattern) > 0 && len(opt.includePattern) == 0 {
+	if opt.isAllFiles &&
+		len(opt.excludePattern) > 0 &&
+		len(opt.includePattern) == 0 {
+		info("[getpatflag] pattern: all; but excluding (regex: %q)", rx.String())
 		pflag = allexcludeFlag
 		goto END
 	}
 	if opt.isAllFiles &&
 		len(opt.excludePattern) > 0 &&
 		len(opt.includePattern) > 0 {
+		info("[getpatflag] pattern: all; but including (regex: %q) and excluding (regex: %q)", ri.String(), rx.String())
 		pflag = allinAndexcludeFlag
 		goto END
 	}
 	if opt.isAllFiles &&
 		len(opt.excludePattern) == 0 &&
 		len(opt.includePattern) > 0 {
+		info("[getpatflag] pattern: all; but including (regex: %q)", ri.String())
 		pflag = allincludeFlag
 		goto END
 	}
@@ -46,18 +61,21 @@ func getpatflag(opt *gloption) (pflag patflag) {
 	if !opt.isAllFiles &&
 		len(opt.excludePattern) > 0 &&
 		len(opt.includePattern) == 0 {
+		info("[getpatflag] pattern: excluding (regex: %q)", rx.String())
 		pflag = excludeFlag
 		goto END
 	}
 	if !opt.isAllFiles &&
 		len(opt.excludePattern) > 0 &&
 		len(opt.includePattern) > 0 {
+		info("[getpatflag] pattern: including (regex: %q) and excluding (regex: %q)", ri.String(), rx.String())
 		pflag = inAndexcludeFlag
 		goto END
 	}
 	if !opt.isAllFiles &&
 		len(opt.excludePattern) == 0 &&
 		len(opt.includePattern) > 0 {
+		info("[getpatflag] pattern: including (regex: %q)", ri.String())
 		pflag = includeFlag
 		goto END
 	}
@@ -66,21 +84,19 @@ END:
 }
 
 func optAllInAndExclude(opt *gloption, pdopt *filetree.PrintDirOption) {
-	ren, err := regexp.Compile(opt.includePattern)
+	ri, err := regexp.Compile(opt.includePattern)
 	if err != nil {
-		paw.Error.Printf("including pattern: %q, error: %v", ren.String(), err)
-		os.Exit(1)
+		fatal("[optAllInAndExclude] including pattern: %q, error: %v", ri.String(), err)
 	}
-	rex, err := regexp.Compile(opt.excludePattern)
+	rx, err := regexp.Compile(opt.excludePattern)
 	if err != nil {
-		paw.Error.Printf("excluding pattern: %q, error: %v", rex.String(), err)
-		os.Exit(1)
+		fatal("excluding pattern: %q, error: %v", rx.String(), err)
 	}
 	pdopt.Ignore = func(f *filetree.File, e error) error {
 		if err != nil {
 			return err
 		}
-		if !ren.MatchString(f.BaseName) && rex.MatchString(f.BaseName) {
+		if !ri.MatchString(f.BaseName) && rx.MatchString(f.BaseName) {
 			return filetree.SkipThis
 		}
 		// if !f.IsDir() {
@@ -92,29 +108,27 @@ func optAllInAndExclude(opt *gloption, pdopt *filetree.PrintDirOption) {
 	}
 }
 func optInAndExclude(opt *gloption, pdopt *filetree.PrintDirOption) {
-	ren, err := regexp.Compile(opt.includePattern)
+	ri, err := regexp.Compile(opt.includePattern)
 	if err != nil {
-		paw.Error.Printf("including pattern: %q, error: %v", ren.String(), err)
-		os.Exit(1)
+		fatal("including pattern: %q, error: %v", ri.String(), err)
 	}
-	rex, err := regexp.Compile(opt.excludePattern)
+	rx, err := regexp.Compile(opt.excludePattern)
 	if err != nil {
-		paw.Error.Printf("excluding pattern: %q, error: %v", rex.String(), err)
-		os.Exit(1)
+		fatal("excluding pattern: %q, error: %v", rx.String(), err)
 	}
 	pdopt.Ignore = func(f *filetree.File, e error) error {
 		if err != nil {
 			return err
 		}
 		_, file := filepath.Split(f.Path)
-		if paw.HasPrefix(file, ".") {
+		if strings.HasPrefix(file, ".") {
 			return filetree.SkipThis
 		}
-		if !ren.MatchString(f.BaseName) && rex.MatchString(f.BaseName) {
+		if !ri.MatchString(f.BaseName) && rx.MatchString(f.BaseName) {
 			return filetree.SkipThis
 		}
 		// if !f.IsDir() {
-		// 	if !ren.MatchString(f.BaseName) && rex.MatchString(f.BaseName) {
+		// 	if !ri.MatchString(f.BaseName) && rex.MatchString(f.BaseName) {
 		// 		return filetree.SkipThis
 		// 	}
 		// }
@@ -122,16 +136,15 @@ func optInAndExclude(opt *gloption, pdopt *filetree.PrintDirOption) {
 	}
 }
 func optAllInclude(opt *gloption, pdopt *filetree.PrintDirOption) {
-	re, err := regexp.Compile(opt.includePattern)
+	ri, err := regexp.Compile(opt.includePattern)
 	if err != nil {
-		paw.Error.Printf("including pattern: %q, error: %v", re.String(), err)
-		os.Exit(1)
+		fatal("including pattern: %q, error: %v", ri.String(), err)
 	}
 	pdopt.Ignore = func(f *filetree.File, e error) error {
 		if err != nil {
 			return err
 		}
-		if !re.MatchString(f.BaseName) {
+		if !ri.MatchString(f.BaseName) {
 			return filetree.SkipThis
 		}
 		// if !f.IsDir() {
@@ -143,20 +156,19 @@ func optAllInclude(opt *gloption, pdopt *filetree.PrintDirOption) {
 	}
 }
 func optInclude(opt *gloption, pdopt *filetree.PrintDirOption) {
-	re, err := regexp.Compile(opt.includePattern)
+	ri, err := regexp.Compile(opt.includePattern)
 	if err != nil {
-		paw.Error.Printf("including pattern: %q, error: %v", re.String(), err)
-		os.Exit(1)
+		fatal("including pattern: %q, error: %v", ri.String(), err)
 	}
 	pdopt.Ignore = func(f *filetree.File, e error) error {
 		if err != nil {
 			return err
 		}
 		_, file := filepath.Split(f.Path)
-		if paw.HasPrefix(file, ".") {
+		if strings.HasPrefix(file, ".") {
 			return filetree.SkipThis
 		}
-		if !re.MatchString(f.BaseName) {
+		if !ri.MatchString(f.BaseName) {
 			return filetree.SkipThis
 		}
 		// if !f.IsDir() {
@@ -169,16 +181,15 @@ func optInclude(opt *gloption, pdopt *filetree.PrintDirOption) {
 }
 
 func optAllExclude(opt *gloption, pdopt *filetree.PrintDirOption) {
-	re, err := regexp.Compile(opt.excludePattern)
+	rx, err := regexp.Compile(opt.excludePattern)
 	if err != nil {
-		paw.Error.Printf("excluding pattern: %q, error: %v", re.String(), err)
-		os.Exit(1)
+		fatal("excluding pattern: %q, error: %v", rx.String(), err)
 	}
 	pdopt.Ignore = func(f *filetree.File, e error) error {
 		if err != nil {
 			return err
 		}
-		if re.MatchString(f.BaseName) {
+		if rx.MatchString(f.BaseName) {
 			return filetree.SkipThis
 		}
 		// if !f.IsDir() {
@@ -191,20 +202,19 @@ func optAllExclude(opt *gloption, pdopt *filetree.PrintDirOption) {
 }
 
 func optExclude(opt *gloption, pdopt *filetree.PrintDirOption) {
-	re, err := regexp.Compile(opt.excludePattern)
+	rx, err := regexp.Compile(opt.excludePattern)
 	if err != nil {
-		paw.Error.Printf("excluding pattern: %q, error: %v", re.String(), err)
-		os.Exit(1)
+		fatal("excluding pattern: %q, error: %v", rx.String(), err)
 	}
 	pdopt.Ignore = func(f *filetree.File, e error) error {
 		if err != nil {
 			return err
 		}
 		_, file := filepath.Split(f.Path)
-		if paw.HasPrefix(file, ".") {
+		if strings.HasPrefix(file, ".") {
 			return filetree.SkipThis
 		}
-		if re.MatchString(f.BaseName) {
+		if rx.MatchString(f.BaseName) {
 			return filetree.SkipThis
 		}
 		// if !f.IsDir() {

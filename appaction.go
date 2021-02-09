@@ -3,16 +3,16 @@ package main
 import (
 	"os"
 
-	"github.com/shyang107/paw"
 	"github.com/shyang107/paw/filetree"
 	"github.com/urfave/cli"
 )
 
 var appAction = func(c *cli.Context) error {
-	opt.path = getPath(c)
+
+	checkArgs(c, pdopt)
 
 	// isList,	isListTree, isTree, isTable, isLevel, depth
-	ckView(opt, pdopt)
+	checkView(opt, pdopt)
 
 	// pattern
 	pflag := getpatflag(opt)
@@ -33,12 +33,11 @@ var appAction = func(c *cli.Context) error {
 		optInAndExclude(opt, pdopt)
 	}
 
-	sortOpt := getSortOption(opt)
+	// sortOpt := getSortOption(opt)
 
-	err := filetree.PrintDir(os.Stdout, opt.path, pdopt, sortOpt, "")
+	err, _ := filetree.PrintDir(os.Stdout, opt.path, pdopt, "")
 	if err != nil {
-		paw.Error.Printf("get file list from %q failed, error: %v", opt.path, err)
-		os.Exit(1)
+		fatal("get file list from %q failed, error: %v", opt.path, err)
 	}
 
 	return nil

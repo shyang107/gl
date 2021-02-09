@@ -1,66 +1,81 @@
 package main
 
 import (
+	"strings"
+
 	"github.com/shyang107/paw/filetree"
 )
 
 var (
-	byMTime filetree.FilesBy = func(fi, fj *filetree.File) bool {
-		return fi.ModifiedTime().Before(fj.ModifiedTime())
-	}
-	bySize filetree.FilesBy = func(fi, fj *filetree.File) bool {
-		return fi.Size < fj.Size
+	sortMapFlag = map[string]filetree.PDSortFlag{
+		"inode":     filetree.PDSortByINode,
+		"links":     filetree.PDSortByLinks,
+		"size":      filetree.PDSortBySize,
+		"blocks":    filetree.PDSortByBlocks,
+		"modified":  filetree.PDSortByMTime,
+		"mtime":     filetree.PDSortByMTime,
+		"accessed":  filetree.PDSortByATime,
+		"atime":     filetree.PDSortByATime,
+		"created":   filetree.PDSortByCTime,
+		"ctime":     filetree.PDSortByCTime,
+		"name":      filetree.PDSortByName,
+		"inoder":    filetree.PDSortByINodeR,
+		"linksr":    filetree.PDSortByLinksR,
+		"sizer":     filetree.PDSortBySizeR,
+		"blocksr":   filetree.PDSortByBlocksR,
+		"modifiedr": filetree.PDSortByMTimeR,
+		"mtimer":    filetree.PDSortByMTimeR,
+		"accessedr": filetree.PDSortByATimeR,
+		"atimer":    filetree.PDSortByATimeR,
+		"createdr":  filetree.PDSortByCTimeR,
+		"ctimer":    filetree.PDSortByCTimeR,
+		"namer":     filetree.PDSortByNameR,
 	}
 )
 
-func getSortOption(opt *gloption) *filetree.PDSortOption {
-	// var sortOpt *filetree.PDSortOption
+func getSortOption(opt *gloption) (sopt *filetree.PDSortOption) {
+	sopt = &filetree.PDSortOption{
+		IsSort:  true,
+		Reverse: false,
+		// SortWay: filetree.PDSortByName, // PDSortFlag
+	}
+
+	if opt.isNoSort {
+		sopt.IsSort = false
+		return sopt
+	}
+
+	var sflag = strings.ToLower(opt.sortByField)
 	if opt.isSortBySize {
-		// paw.Info.Println("opt.isSortBySize", opt.isSortBySize)
-		// paw.Info.Println("  opt.isReverse", opt.isReverse)
-		if opt.isReverse {
-			return &filetree.PDSortOption{
-				IsSort:  true,
-				SortWay: filetree.PDSortByReverseSize,
-			}
-		} else {
-			return &filetree.PDSortOption{
-				IsSort:  true,
-				SortWay: filetree.PDSortBySize,
-			}
-		}
+		sflag = "size"
+	} else if opt.isSortByMTime {
+		sflag = "mtime"
+	} else if opt.isSortByName {
+		sflag = "name"
+		opt.isSortByName = true
 	}
-	if opt.isSortByMTime {
-		// paw.Info.Println("opt.isSortByMTime", opt.isSortByMTime)
-		// paw.Info.Println("  opt.isReverse", opt.isReverse)
-		if opt.isReverse {
-			return &filetree.PDSortOption{
-				IsSort:  true,
-				SortWay: filetree.PDSortByReverseMtime,
-			}
-		} else {
-			return &filetree.PDSortOption{
-				IsSort:  true,
-				SortWay: filetree.PDSortByMtime,
-			}
+
+	if len(sflag) > 0 {
+		if strings.HasSuffix(sflag, "r") {
+			opt.isReverse = true
 		}
-	}
-	// if opt.isSortByName { //default
-	opt.isSortByName = true
-	// paw.Info.Println("opt.isSortByName", opt.isSortByName)
-	// paw.Info.Println("  opt.isReverse", opt.isReverse)
-	if opt.isReverse {
-		return &filetree.PDSortOption{
-			IsSort:  true,
-			SortWay: filetree.PDSortByReverseName,
+		if opt.isReverse && !strings.HasSuffix(sflag, "r") {
+			sflag += "r"
+		}
+		// paw.Logger.WithField("sflag", sflag).Info()
+		sopt.Reverse = opt.isReverse
+		if flag, ok := sortMapFlag[sflag]; ok {
+			sopt.SortWay = flag
+		} else {
+			stderr("%q is not allowed; so, sort by name in increasing order!", opt.sortByField)
+			sflag = "name"
+			flag = sortMapFlag[sflag]
+			sopt.SortWay = flag
 		}
 	} else {
-		return &filetree.PDSortOption{
-			IsSort:  true,
-			SortWay: filetree.PDSortByName,
-		}
+		sflag = "name"
+		sopt.SortWay = sortMapFlag[sflag]
 	}
-	// }
-
-	return nil
+	info("[getSortOption] isSort: %v, Reverse: %v, sort by %q", sopt.IsSort, sopt.Reverse, sflag)
+	return sopt
 }

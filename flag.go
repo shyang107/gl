@@ -6,6 +6,7 @@ import (
 )
 
 type gloption struct {
+	isVerbose      bool
 	path           string
 	isList         bool
 	isListTree     bool
@@ -28,6 +29,14 @@ var (
 	opt   = new(gloption)
 	pdopt = filetree.NewPrintDirOption()
 	err   error
+
+	verboseFlag = cli.BoolFlag{
+		Name:        "verbose",
+		Aliases:     []string{"V"},
+		Value:       false,
+		Usage:       "show verbose message",
+		Destination: &opt.isVerbose,
+	}
 
 	listFlag = cli.BoolFlag{
 		Name:        "list",
@@ -120,6 +129,20 @@ var (
 		Value:       false,
 		Usage:       "sort in decreasing order, default sort by name",
 		Destination: &opt.isReverse,
+	}
+	sortByFieldFlag = cli.StringFlag{
+		Name:        "sort",
+		Aliases:     []string{"sf"},
+		Value:       "",
+		Usage:       "which single `field` to sort by. (field: inode, links, block, size, mtime (ot modified), atime (or accessed), ctime (or created), name; «field»[R]: reverse sort)",
+		Destination: &opt.sortByField,
+	}
+	isSortByNameFlag = cli.BoolFlag{
+		Name:        "sort-by-name",
+		Aliases:     []string{"sn"},
+		Value:       false,
+		Usage:       "sort by name in increasing order (single key)",
+		Destination: &opt.isSortByName,
 	}
 	isSortBySizeFlag = cli.BoolFlag{
 		Name:        "sort-by-size",
