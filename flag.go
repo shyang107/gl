@@ -6,6 +6,7 @@ import (
 )
 
 type gloption struct {
+	isVerbose      bool
 	path           string
 	isList         bool
 	isListTree     bool
@@ -50,6 +51,14 @@ var (
 	opt   = new(gloption)
 	pdopt = filetree.NewPrintDirOption()
 	err   error
+
+	verboseFlag = cli.BoolFlag{
+		Name:        "verbose",
+		Aliases:     []string{"V"},
+		Value:       false,
+		Usage:       "show verbose message",
+		Destination: &opt.isVerbose,
+	}
 
 	listFlag = cli.BoolFlag{
 		Name:        "list",

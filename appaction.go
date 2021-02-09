@@ -3,7 +3,6 @@ package main
 import (
 	"os"
 
-	"github.com/shyang107/paw"
 	"github.com/shyang107/paw/filetree"
 	"github.com/urfave/cli"
 )
@@ -40,8 +39,7 @@ var appAction = func(c *cli.Context) error {
 
 	err, _ := filetree.PrintDir(os.Stdout, opt.path, opt.isGrouped, pdopt, "")
 	if err != nil {
-		paw.Error.Printf("get file list from %q failed, error: %v", opt.path, err)
-		os.Exit(1)
+		fatal("get file list from %q failed, error: %v", opt.path, err)
 	}
 
 	return nil

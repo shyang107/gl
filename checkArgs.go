@@ -17,14 +17,14 @@ func checkArgs(c *cli.Context, pdopt *filetree.PrintDirOption) {
 		if err != nil {
 			paw.Error.Println(err)
 		}
-		// pdopt.AddPath(path)
 		pdopt.SetRoot(path)
-		// paw.Logger.WithField("path", path).Info("None")
+		info("no argument, suppose root is %q", path)
 	case 1:
 		path, err := filepath.Abs(c.Args().Get(0))
 		if err != nil {
 			paw.Error.Println(err)
 		}
+		info("one argument, root is %q", path)
 		fi, err := os.Stat(path)
 		if err != nil {
 			paw.Error.Println(err)
@@ -37,6 +37,7 @@ func checkArgs(c *cli.Context, pdopt *filetree.PrintDirOption) {
 		}
 	// 	// paw.Logger.WithField("path", path).Info("One")
 	default: // > 1
+		info("multi-arguments")
 		for i := 0; i < c.NArg(); i++ {
 			// paw.Logger.WithField("args", c.Args().Get(i)).Info()
 			path, err := filepath.Abs(c.Args().Get(i))
@@ -44,6 +45,7 @@ func checkArgs(c *cli.Context, pdopt *filetree.PrintDirOption) {
 				paw.Error.Println(err)
 				continue
 			}
+			info("multi-arguments, argument %d is %q", i+1, path)
 			pdopt.AddPath(path)
 			// paw.Logger.WithField("path", path).Info("Multi")
 		}

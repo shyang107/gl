@@ -3,7 +3,6 @@ package main
 import (
 	"strings"
 
-	"github.com/shyang107/paw"
 	"github.com/shyang107/paw/filetree"
 )
 
@@ -68,10 +67,15 @@ func getSortOption(opt *gloption) (sopt *filetree.PDSortOption) {
 		if flag, ok := sortMapFlag[sflag]; ok {
 			sopt.SortWay = flag
 		} else {
-			paw.Error.Printf("%q is not allowed; so, sort by name in increasing order!\n", opt.sortByField)
-			flag = sortMapFlag["name"]
+			stderr("%q is not allowed; so, sort by name in increasing order!", opt.sortByField)
+			sflag = "name"
+			flag = sortMapFlag[sflag]
 			sopt.SortWay = flag
 		}
+	} else {
+		sflag = "name"
+		sopt.SortWay = sortMapFlag[sflag]
 	}
+	info("isSort: %v, Reverse: %v, sort by %q", sopt.IsSort, sopt.Reverse, sflag)
 	return sopt
 }
