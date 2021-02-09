@@ -76,6 +76,6 @@ func getSortOption(opt *gloption) (sopt *filetree.PDSortOption) {
 		sflag = "name"
 		sopt.SortWay = sortMapFlag[sflag]
 	}
-	info("isSort: %v, Reverse: %v, sort by %q", sopt.IsSort, sopt.Reverse, sflag)
+	info("[getSortOption] isSort: %v, Reverse: %v, sort by %q", sopt.IsSort, sopt.Reverse, sflag)
 	return sopt
 }

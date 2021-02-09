@@ -70,7 +70,7 @@ func getFieldFlag(opt *gloption) filetree.PDFieldFlag {
 		fields = append(fields, "Git")
 	}
 	fields = append(fields, "Name")
-	info("fields includes %#v", fields)
+	info("[getFieldFlag] fields includes %#v", fields)
 
 	return flag
 }
