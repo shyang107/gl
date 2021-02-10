@@ -16,7 +16,7 @@ func getFieldFlag(opt *gloption) filetree.PDFieldFlag {
 		fields = append(fields, "inode")
 	}
 
-	flag = filetree.PFieldPermissions
+	flag = flag | filetree.PFieldPermissions
 	fields = append(fields, "Permission")
 
 	if opt.isFieldLinks {
