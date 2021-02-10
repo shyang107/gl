@@ -19,10 +19,32 @@ type gloption struct {
 	isAllFiles     bool
 	includePattern string
 	excludePattern string
-	isSortByName   bool //default name
-	isReverse      bool
-	isSortBySize   bool
-	isSortByMTime  bool
+
+	isNoEmptyDirs bool
+	isJustFiles   bool
+	isJustDirs    bool
+
+	isNoSort      bool
+	isReverse     bool
+	sortByField   string
+	isSortByName  bool //default name
+	isSortBySize  bool
+	isSortByMTime bool
+	isGrouped     bool
+	isExtended    bool
+
+	// view field
+	isFieldINode       bool // inode
+	isFieldPermissions bool // permissions
+	isFieldLinks       bool
+	isFieldSize        bool
+	isFieldBlocks      bool
+	isFieldUser        bool
+	isFieldGroup       bool
+	isFieldModified    bool // date modified
+	isFieldAccessed    bool // date accessed
+	isFieldCreated     bool // date created
+	isFieldGit         bool
 }
 
 var (
@@ -116,12 +138,34 @@ var (
 		Destination: &opt.excludePattern,
 	}
 
-	isSortByNameFlag = cli.BoolFlag{
-		Name:        "sort-by-name",
-		Aliases:     []string{"s"},
+	isNoEmptyDirsFlag = cli.BoolFlag{
+		Name:        "no-empty-dirs",
+		Aliases:     []string{"O"},
 		Value:       false,
-		Usage:       "sort by name in increasing order (single key)",
-		Destination: &opt.isSortByName,
+		Usage:       "show all files but not empty directories",
+		Destination: &opt.isNoEmptyDirs,
+	}
+	isJustFilesFlag = cli.BoolFlag{
+		Name:        "just-files",
+		Aliases:     []string{"F"},
+		Value:       false,
+		Usage:       "show all files but not directories, has high priority than --just-dirs",
+		Destination: &opt.isJustFiles,
+	}
+	isJustDirsFlag = cli.BoolFlag{
+		Name:        "just-dirs",
+		Aliases:     []string{"D"},
+		Value:       false,
+		Usage:       "show all dirs but not files",
+		Destination: &opt.isJustDirs,
+	}
+
+	isNoSortFlag = cli.BoolFlag{
+		Name:        "no-sort",
+		Aliases:     []string{"N"},
+		Value:       false,
+		Usage:       "not sort by name in increasing order (single key)",
+		Destination: &opt.isNoSort,
 	}
 	isReverseFlag = cli.BoolFlag{
 		Name:        "reverse",
@@ -146,16 +190,111 @@ var (
 	}
 	isSortBySizeFlag = cli.BoolFlag{
 		Name:        "sort-by-size",
-		Aliases:     []string{"z"},
+		Aliases:     []string{"sz"},
 		Value:       false,
 		Usage:       "sort by size in increasing order (single key)",
 		Destination: &opt.isSortBySize,
 	}
 	isSortByMTimeFlag = cli.BoolFlag{
 		Name:        "sort-by-mtime",
-		Aliases:     []string{"m"},
+		Aliases:     []string{"sm"},
 		Value:       false,
 		Usage:       "sort by modified time in increasing order (single key)",
 		Destination: &opt.isSortByMTime,
+	}
+
+	isGroupedFlag = cli.BoolFlag{
+		Name:        "grouped",
+		Aliases:     []string{"g"},
+		Value:       false,
+		Usage:       "group files and directories separately",
+		Destination: &opt.isGrouped,
+	}
+
+	isExtendedFlag = cli.BoolFlag{
+		Name:        "extended",
+		Aliases:     []string{"@"},
+		Value:       false,
+		Usage:       "list each file's extended attributes and sizes",
+		Destination: &opt.isExtended,
+	}
+
+	isFieldINodeFlag = cli.BoolFlag{
+		Name:        "inode",
+		Aliases:     []string{"i"},
+		Value:       false,
+		Usage:       "list each file's inode number",
+		Destination: &opt.isFieldINode,
+	}
+	// isFieldPermissionsFlag = cli.BoolFlag{
+	// 	Name:        "permissions",
+	// 	Aliases:     []string{"p"},
+	// 	Value:       false,
+	// 	Usage:       "list each file's permissions",
+	// 	Destination: &opt.isFieldPermissions,
+	// }
+	isFieldLinksFlag = cli.BoolFlag{
+		Name:        "links",
+		Aliases:     []string{"H"},
+		Value:       false,
+		Usage:       "list each file's number of hard links",
+		Destination: &opt.isFieldLinks,
+	}
+	// isFieldSizeFlag = cli.BoolFlag{
+	// 	Name:        "size",
+	// 	Aliases:     []string{"S"},
+	// 	Value:       false,
+	// 	Usage:       "list each file's size",
+	// 	Destination: &opt.isFieldSize,
+	// }
+	isFieldBlocksFlag = cli.BoolFlag{
+		Name:        "blocks",
+		Aliases:     []string{"B"},
+		Value:       false,
+		Usage:       "show number of file system blocks",
+		Destination: &opt.isFieldBlocks,
+	}
+	// isFieldUserFlag = cli.BoolFlag{
+	// 	Name:        "user",
+	// 	Aliases:     []string{"ur"},
+	// 	Value:       false,
+	// 	Usage:       "show user's name",
+	// 	Destination: &opt.isFieldUser,
+	// }
+	// isFieldGroupFlag = cli.BoolFlag{
+	// 	Name:        "group",
+	// 	Aliases:     []string{"gp"},
+	// 	Value:       false,
+	// 	Usage:       "show user's group name",
+	// 	Destination: &opt.isFieldGroup,
+	// }
+	isFieldGitFlag = cli.BoolFlag{
+		Name: "git",
+		// Aliases:     []string{"gp"},
+		Value:       false,
+		Usage:       " list each file's Git status, if tracked or ignored",
+		Destination: &opt.isFieldGit,
+	}
+
+	isModifiedFlag = cli.BoolFlag{
+		Name:        "modified",
+		Aliases:     []string{"m"},
+		Value:       false,
+		Usage:       "use the modified timestamp field",
+		Destination: &opt.isFieldModified,
+	}
+	isAccessedFlag = cli.BoolFlag{
+		Name:        "accessed",
+		Aliases:     []string{"u"},
+		Value:       false,
+		Usage:       "use the accessed timestamp field",
+		Destination: &opt.isFieldAccessed,
+	}
+	isCreatedFlag = cli.BoolFlag{
+		Name:        "created",
+		Aliases:     []string{"U"},
+		Value:       false,
+		Usage:       "use the created timestamp field",
+		Destination: &opt.isFieldCreated,
 	}
 )

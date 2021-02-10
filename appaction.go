@@ -35,7 +35,7 @@ var appAction = func(c *cli.Context) error {
 
 	// sortOpt := getSortOption(opt)
 
-	err, _ := filetree.PrintDir(os.Stdout, opt.path, pdopt, "")
+	err, _ := filetree.PrintDir(os.Stdout, opt.path, opt.isGrouped, pdopt, "")
 	if err != nil {
 		fatal("get file list from %q failed, error: %v", opt.path, err)
 	}
