@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/shyang107/paw/filetree"
+	"github.com/sirupsen/logrus"
 )
 
 func getFieldFlag(opt *gloption) filetree.PDFieldFlag {
@@ -10,24 +11,19 @@ func getFieldFlag(opt *gloption) filetree.PDFieldFlag {
 		fields []string
 	)
 
-	flag = filetree.PFieldPermissions
-	fields = append(fields, "Permission")
 	if opt.isFieldINode {
 		flag = flag | filetree.PFieldINode
 		fields = append(fields, "inode")
 	}
 
-	// if opt.isFieldPermissions {
-	// 	flag = flag | filetree.PFieldPermissions
-	// }
+	flag = filetree.PFieldPermissions
+	fields = append(fields, "Permission")
 
 	if opt.isFieldLinks {
 		flag = flag | filetree.PFieldLinks
 		fields = append(fields, "Links")
 	}
-	// if opt.isFieldSize {
-	// 	flag = flag | filetree.PFieldSize
-	// }
+
 	flag = flag | filetree.PFieldSize
 	fields = append(fields, "Size")
 
@@ -35,14 +31,10 @@ func getFieldFlag(opt *gloption) filetree.PDFieldFlag {
 		flag = flag | filetree.PFieldBlocks
 		fields = append(fields, "Blocks")
 	}
-	// if opt.isFieldUser {
-	// 	flag = flag | filetree.PFieldUser
-	// }
+
 	flag = flag | filetree.PFieldUser
 	fields = append(fields, "User")
-	// if opt.isFieldGroup {
-	// 	flag = flag | filetree.PFieldGroup
-	// }
+
 	flag = flag | filetree.PFieldGroup
 	fields = append(fields, "Group")
 
@@ -70,7 +62,10 @@ func getFieldFlag(opt *gloption) filetree.PDFieldFlag {
 		fields = append(fields, "Git")
 	}
 	fields = append(fields, "Name")
-	info("[getFieldFlag] fields includes %#v", fields)
+	lg.WithFields(logrus.Fields{
+		"N":      len(fields),
+		"fields": fields,
+	}).Trace()
 
 	return flag
 }

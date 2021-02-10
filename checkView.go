@@ -9,27 +9,28 @@ func checkView(opt *gloption, pdopt *filetree.PrintDirOption) {
 			opt.depth = -1
 		}
 		pdopt.OutOpt = filetree.PListTreeView
-		info("[checkView] pdopt.OutOpt: ListTree view")
+		lg.WithField("view", "ListTree").Trace()
 	} else if opt.isTree {
 		if opt.depth == 0 {
 			opt.depth = -1
 		}
 		pdopt.OutOpt = filetree.PTreeView
-		info("[checkView] pdopt.OutOpt: Tree view")
+		lg.WithField("view", "Tree").Trace()
 	} else if opt.isTable {
 		pdopt.OutOpt = filetree.PTableView
+		lg.WithField("view", "Table").Trace()
 	} else if opt.isLevel {
 		pdopt.OutOpt = filetree.PLevelView
-		info("[checkView] pdopt.OutOpt: Table view")
+		lg.WithField("view", "Level").Trace()
 	} else if opt.isClassify {
 		pdopt.OutOpt = filetree.PClassifyView
-		info("[checkView] pdopt.OutOpt: Clssify view")
+		lg.WithField("view", "Clssify").Trace()
 	} else if opt.isList {
-		info("[checkView] pdopt.OutOpt: List view")
+		lg.WithField("view", "List").Trace()
 	}
 
 	if opt.isExtended {
-		info("[checkView] show extended attributes")
+		lg.Trace("show extended attributes")
 		switch {
 		case pdopt.OutOpt == filetree.PLevelView:
 			pdopt.OutOpt = filetree.PLevelExtendView
@@ -49,5 +50,5 @@ func checkView(opt *gloption, pdopt *filetree.PrintDirOption) {
 	}
 
 	pdopt.Depth = opt.depth
-	info("[checkView] pdopt.Depth is %d", pdopt.Depth)
+	lg.WithField("depth", pdopt.Depth).Trace()
 }

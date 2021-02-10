@@ -13,6 +13,8 @@ var appAction = func(c *cli.Context) error {
 	if opt.isVerbose {
 		pdopt.EnableTrace(opt.isVerbose)
 		lg.SetLevel(logrus.TraceLevel)
+	} else {
+		lg.SetLevel(logrus.WarnLevel)
 	}
 
 	checkArgs(c, pdopt)

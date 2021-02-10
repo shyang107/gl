@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/shyang107/paw/filetree"
+	"github.com/sirupsen/logrus"
 )
 
 func getFiltOption(opt *gloption) *filetree.PDFilterOption {
@@ -10,9 +11,14 @@ func getFiltOption(opt *gloption) *filetree.PDFilterOption {
 		IsFilt: false,
 	}
 
+	var fields = logrus.Fields{
+		"isNoEmptyDirs": opt.isNoEmptyDirs,
+		"isJustDirs":    opt.isJustDirs,
+		"isJustFiles":   opt.isJustFiles,
+	}
 	if opt.isJustFiles &&
 		opt.isJustDirs { // -F -D
-		info("[getFiltOption] Filt: files adn dirs")
+		lg.WithFields(fields).Trace("files adn dirs")
 		filtOpt.IsFilt = true
 		filtOpt.FiltWay = filetree.PDFiltJustFiles
 		return filtOpt
@@ -21,7 +27,7 @@ func getFiltOption(opt *gloption) *filetree.PDFilterOption {
 	if opt.isNoEmptyDirs &&
 		!opt.isJustDirs &&
 		!opt.isJustFiles { // -O
-		info("[getFiltOption] Filt: no empty dir")
+		lg.WithFields(fields).Trace("no empty dir")
 		filtOpt.IsFilt = true
 		filtOpt.FiltWay = filetree.PDFiltNoEmptyDir
 		return filtOpt
@@ -30,7 +36,7 @@ func getFiltOption(opt *gloption) *filetree.PDFilterOption {
 	if opt.isNoEmptyDirs &&
 		opt.isJustDirs &&
 		!opt.isJustFiles { // -D -O
-		info("[getFiltOption] Filt: just dirs, but no empty")
+		lg.WithFields(fields).Trace("just dirs, but no empty")
 		filtOpt.IsFilt = true
 		filtOpt.FiltWay = filetree.PDFiltJustDirsButNoEmpty
 		return filtOpt
@@ -39,7 +45,7 @@ func getFiltOption(opt *gloption) *filetree.PDFilterOption {
 	if opt.isNoEmptyDirs &&
 		!opt.isJustDirs &&
 		opt.isJustFiles { // -F -O
-		info("[getFiltOption] Filt: just files, but no empty dir")
+		lg.WithFields(fields).Trace("just files, but no empty dir")
 		filtOpt.IsFilt = true
 		filtOpt.FiltWay = filetree.PDFiltJustFilesButNoEmptyDir
 		return filtOpt
@@ -48,7 +54,7 @@ func getFiltOption(opt *gloption) *filetree.PDFilterOption {
 	if !opt.isNoEmptyDirs &&
 		!opt.isJustDirs &&
 		opt.isJustFiles { // -F
-		info("[getFiltOption] Filt: just files")
+		lg.WithFields(fields).Trace("just files")
 		filtOpt.IsFilt = true
 		filtOpt.FiltWay = filetree.PDFiltJustFiles
 		return filtOpt
@@ -57,7 +63,7 @@ func getFiltOption(opt *gloption) *filetree.PDFilterOption {
 	if !opt.isNoEmptyDirs &&
 		opt.isJustDirs &&
 		!opt.isJustFiles { // -D
-		info("[getFiltOption] Filt: just dirs")
+		lg.WithFields(fields).Trace("just dirs")
 		filtOpt.IsFilt = true
 		filtOpt.FiltWay = filetree.PDFiltJustDirs
 		return filtOpt

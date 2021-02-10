@@ -1,11 +1,13 @@
 package main
 
 import (
+	"fmt"
 	"path/filepath"
 	"regexp"
 	"strings"
 
 	"github.com/shyang107/paw/filetree"
+	"github.com/sirupsen/logrus"
 )
 
 type patflag int
@@ -21,39 +23,44 @@ const (
 )
 
 func getpatflag(opt *gloption) (pflag patflag) {
-	var ri, rx *regexp.Regexp
-	if len(opt.includePattern) > 0 {
-		ri, _ = regexp.Compile(opt.includePattern)
-	}
-	if len(opt.excludePattern) > 0 {
-		rx, _ = regexp.Compile(opt.excludePattern)
-	}
 
 	if opt.isAllFiles &&
 		len(opt.excludePattern) == 0 &&
 		len(opt.includePattern) == 0 {
-		info("[getpatflag] pattern: all")
+		lg.WithFields(logrus.Fields{
+			"ri_pat": fmt.Sprintf("%q", opt.includePattern),
+			"rx_pat": fmt.Sprintf("%q", opt.excludePattern),
+		}).Trace("pattern: all")
 		pflag = allFlag
 		goto END
 	}
 	if opt.isAllFiles &&
 		len(opt.excludePattern) > 0 &&
 		len(opt.includePattern) == 0 {
-		info("[getpatflag] pattern: all; but excluding (regex: %q)", rx.String())
+		lg.WithFields(logrus.Fields{
+			"ri_pat": fmt.Sprintf("%q", opt.includePattern),
+			"rx_pat": fmt.Sprintf("%q", opt.excludePattern),
+		}).Trace("pattern: all; but excluding")
 		pflag = allexcludeFlag
 		goto END
 	}
 	if opt.isAllFiles &&
 		len(opt.excludePattern) > 0 &&
 		len(opt.includePattern) > 0 {
-		info("[getpatflag] pattern: all; but including (regex: %q) and excluding (regex: %q)", ri.String(), rx.String())
+		lg.WithFields(logrus.Fields{
+			"ri_pat": fmt.Sprintf("%q", opt.includePattern),
+			"rx_pat": fmt.Sprintf("%q", opt.excludePattern),
+		}).Trace("pattern: all; but including and excluding")
 		pflag = allinAndexcludeFlag
 		goto END
 	}
 	if opt.isAllFiles &&
 		len(opt.excludePattern) == 0 &&
 		len(opt.includePattern) > 0 {
-		info("[getpatflag] pattern: all; but including (regex: %q)", ri.String())
+		lg.WithFields(logrus.Fields{
+			"ri_pat": fmt.Sprintf("%q", opt.includePattern),
+			"rx_pat": fmt.Sprintf("%q", opt.excludePattern),
+		}).Trace("pattern: all; but including")
 		pflag = allincludeFlag
 		goto END
 	}
@@ -61,21 +68,30 @@ func getpatflag(opt *gloption) (pflag patflag) {
 	if !opt.isAllFiles &&
 		len(opt.excludePattern) > 0 &&
 		len(opt.includePattern) == 0 {
-		info("[getpatflag] pattern: excluding (regex: %q)", rx.String())
+		lg.WithFields(logrus.Fields{
+			"ri_pat": fmt.Sprintf("%q", opt.includePattern),
+			"rx_pat": fmt.Sprintf("%q", opt.excludePattern),
+		}).Trace("pattern: excluding")
 		pflag = excludeFlag
 		goto END
 	}
 	if !opt.isAllFiles &&
 		len(opt.excludePattern) > 0 &&
 		len(opt.includePattern) > 0 {
-		info("[getpatflag] pattern: including (regex: %q) and excluding (regex: %q)", ri.String(), rx.String())
+		lg.WithFields(logrus.Fields{
+			"ri_pat": fmt.Sprintf("%q", opt.includePattern),
+			"rx_pat": fmt.Sprintf("%q", opt.excludePattern),
+		}).Trace("pattern: including and excluding")
 		pflag = inAndexcludeFlag
 		goto END
 	}
 	if !opt.isAllFiles &&
 		len(opt.excludePattern) == 0 &&
 		len(opt.includePattern) > 0 {
-		info("[getpatflag] pattern: including (regex: %q)", ri.String())
+		lg.WithFields(logrus.Fields{
+			"ri_pat": fmt.Sprintf("%q", opt.includePattern),
+			"rx_pat": fmt.Sprintf("%q", opt.excludePattern),
+		}).Trace("pattern: including")
 		pflag = includeFlag
 		goto END
 	}

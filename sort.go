@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/shyang107/paw/filetree"
+	"github.com/sirupsen/logrus"
 )
 
 var (
@@ -76,6 +77,10 @@ func getSortOption(opt *gloption) (sopt *filetree.PDSortOption) {
 		sflag = "name"
 		sopt.SortWay = sortMapFlag[sflag]
 	}
-	info("[getSortOption] isSort: %v, Reverse: %v, sort by %q", sopt.IsSort, sopt.Reverse, sflag)
+	lg.WithFields(logrus.Fields{
+		"isSort":    sopt.IsSort,
+		"isReverse": sopt.Reverse,
+		"sortBy":    sflag,
+	}).Trace()
 	return sopt
 }
