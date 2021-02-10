@@ -19,6 +19,7 @@ const (
 var (
 	app         = cli.NewApp()
 	programName string
+	lg          = paw.Logger
 )
 
 func init() {

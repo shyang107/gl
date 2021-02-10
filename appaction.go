@@ -4,10 +4,16 @@ import (
 	"os"
 
 	"github.com/shyang107/paw/filetree"
+	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
 )
 
 var appAction = func(c *cli.Context) error {
+
+	if opt.isVerbose {
+		pdopt.EnableTrace(opt.isVerbose)
+		lg.SetLevel(logrus.TraceLevel)
+	}
 
 	checkArgs(c, pdopt)
 
