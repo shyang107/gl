@@ -33,7 +33,9 @@ var appAction = func(c *cli.Context) error {
 		optInAndExclude(opt, pdopt)
 	}
 
-	// sortOpt := getSortOption(opt)
+	pdopt.FieldFlag = getFieldFlag(opt)
+	pdopt.SortOpt = getSortOption(opt)
+	pdopt.FiltOpt = getFiltOption(opt)
 
 	err, _ := filetree.PrintDir(os.Stdout, opt.path, opt.isGrouped, pdopt, "")
 	if err != nil {
