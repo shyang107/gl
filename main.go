@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	version = "0.0.7.4"
+	version = "0.0.7.5"
 )
 
 var (
@@ -42,7 +42,7 @@ func init() {
 	app.UsageText = "web-gl command [command options] [arguments...]"
 	app.Version = version
 	// app.Compiled = time.Now()
-	app.Compiled = cast.ToTime("2021-02-10")
+	app.Compiled = cast.ToTime("2021-02-11")
 	app.Authors = []*cli.Author{
 		{
 			Name:  "Shuhhua Yang",

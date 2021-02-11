@@ -8,22 +8,22 @@ func checkView(opt *gloption, pdopt *filetree.PrintDirOption) {
 		if opt.depth == 0 {
 			opt.depth = -1
 		}
-		pdopt.OutOpt = filetree.PListTreeView
+		pdopt.ViewFlag = filetree.PListTreeView
 		lg.WithField("view", "ListTree").Trace()
 	} else if opt.isTree {
 		if opt.depth == 0 {
 			opt.depth = -1
 		}
-		pdopt.OutOpt = filetree.PTreeView
+		pdopt.ViewFlag = filetree.PTreeView
 		lg.WithField("view", "Tree").Trace()
 	} else if opt.isTable {
-		pdopt.OutOpt = filetree.PTableView
+		pdopt.ViewFlag = filetree.PTableView
 		lg.WithField("view", "Table").Trace()
 	} else if opt.isLevel {
-		pdopt.OutOpt = filetree.PLevelView
+		pdopt.ViewFlag = filetree.PLevelView
 		lg.WithField("view", "Level").Trace()
 	} else if opt.isClassify {
-		pdopt.OutOpt = filetree.PClassifyView
+		pdopt.ViewFlag = filetree.PClassifyView
 		lg.WithField("view", "Clssify").Trace()
 	} else if opt.isList {
 		lg.WithField("view", "List").Trace()
@@ -31,18 +31,20 @@ func checkView(opt *gloption, pdopt *filetree.PrintDirOption) {
 
 	if opt.isExtended {
 		lg.Trace("show extended attributes")
-		switch {
-		case pdopt.OutOpt == filetree.PLevelView:
-			pdopt.OutOpt = filetree.PLevelExtendView
-		case pdopt.OutOpt == filetree.PTableView:
-			pdopt.OutOpt = filetree.PTableExtendView
-		case pdopt.OutOpt == filetree.PTreeView:
-			pdopt.OutOpt = filetree.PTreeExtendView
-		case pdopt.OutOpt == filetree.PListTreeView:
-			pdopt.OutOpt = filetree.PListTreeExtendView
+		var view filetree.PDViewFlag
+		switch pdopt.ViewFlag {
+		case filetree.PLevelView:
+			view = filetree.PLevelExtendView
+		case filetree.PTableView:
+			view = filetree.PTableExtendView
+		case filetree.PTreeView:
+			view = filetree.PTreeExtendView
+		case filetree.PListTreeView:
+			view = filetree.PListTreeExtendView
 		default:
-			pdopt.OutOpt = filetree.PListExtendView
+			view = filetree.PListExtendView
 		}
+		pdopt.ViewFlag = view
 	}
 
 	if opt.isRecurse {
