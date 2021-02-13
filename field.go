@@ -13,59 +13,59 @@ func getFieldFlag(opt *gloption) filetree.PDFieldFlag {
 
 	if opt.isFieldINode {
 		flag = flag | filetree.PFieldINode
-		fields = append(fields, "inode")
+		fields = append(fields, filetree.PFieldINode.Name())
 	}
 
 	flag = flag | filetree.PFieldPermissions
-	fields = append(fields, "Permission")
+	fields = append(fields, filetree.PFieldPermissions.Name())
 
 	if opt.isFieldLinks {
 		flag = flag | filetree.PFieldLinks
-		fields = append(fields, "Links")
+		fields = append(fields, filetree.PFieldLinks.Name())
 	}
 
 	flag = flag | filetree.PFieldSize
-	fields = append(fields, "Size")
+	fields = append(fields, filetree.PFieldSize.Name())
 
 	if opt.isFieldBlocks {
 		flag = flag | filetree.PFieldBlocks
-		fields = append(fields, "Blocks")
+		fields = append(fields, filetree.PFieldBlocks.Name())
 	}
 
 	flag = flag | filetree.PFieldUser
-	fields = append(fields, "User")
+	fields = append(fields, filetree.PFieldUser.Name())
 
 	flag = flag | filetree.PFieldGroup
-	fields = append(fields, "Group")
+	fields = append(fields, filetree.PFieldGroup.Name())
 
 	if opt.isFieldModified {
 		flag = flag | filetree.PFieldModified
-		fields = append(fields, "Modified")
+		fields = append(fields, filetree.PFieldModified.Name())
 	}
 	if opt.isFieldAccessed {
 		flag = flag | filetree.PFieldAccessed
-		fields = append(fields, "Accessed")
+		fields = append(fields, filetree.PFieldAccessed.Name())
 	}
 	if opt.isFieldCreated {
 		flag = flag | filetree.PFieldCreated
-		fields = append(fields, "Created")
+		fields = append(fields, filetree.PFieldCreated.Name())
 	}
 	if !opt.isFieldModified &&
 		!opt.isFieldAccessed &&
 		!opt.isFieldCreated {
 		flag = flag | filetree.PFieldModified
-		fields = append(fields, "Modified")
+		fields = append(fields, filetree.PFieldModified.Name())
 	}
 
 	if opt.isFieldGit {
 		flag = flag | filetree.PFieldGit
-		fields = append(fields, "Git")
+		fields = append(fields, filetree.PFieldGit.Name())
 	}
-	fields = append(fields, "Name")
+	fields = append(fields, filetree.PFieldName.Name())
 	lg.WithFields(logrus.Fields{
 		"N":      len(fields),
 		"fields": fields,
-	}).Trace()
+	}).Trace("fields")
 
 	return flag
 }

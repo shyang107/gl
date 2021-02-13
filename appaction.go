@@ -23,23 +23,7 @@ var appAction = func(c *cli.Context) error {
 	checkView(opt, pdopt)
 
 	// pattern
-	pflag := getpatflag(opt)
-	switch pflag {
-	case allFlag:
-		optAllFiles(opt, pdopt)
-	case includeFlag:
-		optInclude(opt, pdopt)
-	case excludeFlag:
-		optExclude(opt, pdopt)
-	case allincludeFlag:
-		optAllInclude(opt, pdopt)
-	case allexcludeFlag:
-		optAllExclude(opt, pdopt)
-	case allinAndexcludeFlag:
-		optAllInAndExclude(opt, pdopt)
-	case inAndexcludeFlag:
-		optInAndExclude(opt, pdopt)
-	}
+	pdopt.Ignore = getPatternflag(opt).Ignore(opt)
 
 	pdopt.FieldFlag = getFieldFlag(opt)
 	pdopt.SortOpt = getSortOption(opt)

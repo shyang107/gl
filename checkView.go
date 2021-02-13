@@ -1,6 +1,9 @@
 package main
 
-import "github.com/shyang107/paw/filetree"
+import (
+	"github.com/shyang107/paw/filetree"
+	"github.com/sirupsen/logrus"
+)
 
 func checkView(opt *gloption, pdopt *filetree.PrintDirOption) {
 
@@ -9,24 +12,19 @@ func checkView(opt *gloption, pdopt *filetree.PrintDirOption) {
 			opt.depth = -1
 		}
 		pdopt.ViewFlag = filetree.PListTreeView
-		lg.WithField("view", "ListTree").Trace()
 	} else if opt.isTree {
 		if opt.depth == 0 {
 			opt.depth = -1
 		}
 		pdopt.ViewFlag = filetree.PTreeView
-		lg.WithField("view", "Tree").Trace()
 	} else if opt.isTable {
 		pdopt.ViewFlag = filetree.PTableView
-		lg.WithField("view", "Table").Trace()
 	} else if opt.isLevel {
 		pdopt.ViewFlag = filetree.PLevelView
-		lg.WithField("view", "Level").Trace()
 	} else if opt.isClassify {
 		pdopt.ViewFlag = filetree.PClassifyView
-		lg.WithField("view", "Clssify").Trace()
 	} else if opt.isList {
-		lg.WithField("view", "List").Trace()
+		pdopt.ViewFlag = filetree.PListView
 	}
 
 	if opt.isExtended {
@@ -46,11 +44,14 @@ func checkView(opt *gloption, pdopt *filetree.PrintDirOption) {
 		}
 		pdopt.ViewFlag = view
 	}
-
 	if opt.isRecurse {
 		opt.depth = -1
 	}
 
 	pdopt.Depth = opt.depth
-	lg.WithField("depth", pdopt.Depth).Trace()
+
+	lg.WithFields(logrus.Fields{
+		"view":  pdopt.ViewFlag.String(),
+		"depth": pdopt.Depth,
+	}).Trace("view")
 }
