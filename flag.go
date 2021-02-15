@@ -45,6 +45,7 @@ type gloption struct {
 	isFieldAccessed    bool // date accessed
 	isFieldCreated     bool // date created
 	isFieldGit         bool
+	isFieldMd5         bool
 }
 
 var (
@@ -205,7 +206,7 @@ var (
 
 	isGroupedFlag = cli.BoolFlag{
 		Name:        "grouped",
-		Aliases:     []string{"g"},
+		Aliases:     []string{"G"},
 		Value:       false,
 		Usage:       "group files and directories separately",
 		Destination: &opt.isGrouped,
@@ -269,11 +270,18 @@ var (
 	// 	Destination: &opt.isFieldGroup,
 	// }
 	isFieldGitFlag = cli.BoolFlag{
-		Name: "git",
-		// Aliases:     []string{"gp"},
+		Name:        "git",
+		Aliases:     []string{"g"},
 		Value:       false,
 		Usage:       " list each file's Git status, if tracked or ignored",
 		Destination: &opt.isFieldGit,
+	}
+	isFieldMd5Flag = cli.BoolFlag{
+		Name:        "md5",
+		Aliases:     []string{"5"},
+		Value:       false,
+		Usage:       " list each file's md5 field",
+		Destination: &opt.isFieldMd5,
 	}
 
 	isModifiedFlag = cli.BoolFlag{

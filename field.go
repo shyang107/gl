@@ -57,10 +57,16 @@ func getFieldFlag(opt *gloption) filetree.PDFieldFlag {
 		fields = append(fields, filetree.PFieldModified.Name())
 	}
 
+	if opt.isFieldMd5 {
+		flag = flag | filetree.PFieldMd5
+		fields = append(fields, filetree.PFieldMd5.Name())
+	}
+
 	if opt.isFieldGit {
 		flag = flag | filetree.PFieldGit
 		fields = append(fields, filetree.PFieldGit.Name())
 	}
+
 	fields = append(fields, filetree.PFieldName.Name())
 	lg.WithFields(logrus.Fields{
 		"N":      len(fields),

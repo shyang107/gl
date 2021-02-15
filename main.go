@@ -82,6 +82,7 @@ func init() {
 		&isFieldBlocksFlag,
 		// &isFieldUserFlag, &isFieldGroupFlag,
 		&isModifiedFlag, &isAccessedFlag, &isCreatedFlag,
+		&isFieldMd5Flag,
 		&isFieldGitFlag,
 		&isExtendedFlag,
 		&isNoSortFlag, &isReverseFlag, &sortByFieldFlag, &isSortByNameFlag, &isSortBySizeFlag, &isSortByMTimeFlag,
